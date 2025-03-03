@@ -219,3 +219,8 @@ Entity::Entity(const std::string& phraseName)
     ClearTerminal();
     DrawFrameFromFile("ramka.txt",0,0);
 }
+
+void Entity::NextAction()
+{
+    std::cout << "Entity is destroyed";
+}

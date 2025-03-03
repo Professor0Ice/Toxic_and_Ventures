@@ -1,5 +1,5 @@
 ﻿#include "BearLibTerminal.h"
-#include "Entitys.h"
+#include "GameLogic.h"
 
 int main() {
     Player player(1);

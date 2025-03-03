@@ -50,5 +50,5 @@ class Entity {
 public:
 	Entity(const std::string& phraseName);
 private:
-	virtual void NextAction() = 0;
+	virtual void NextAction();
 };

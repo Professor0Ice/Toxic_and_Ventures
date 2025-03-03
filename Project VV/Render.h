@@ -14,6 +14,8 @@
 namespace fs = std::filesystem;
 using json = nlohmann::json;
 
+std::wstring operator*(const std::wstring& str, int n);
+
 std::wstring LoadPhrase(const std::string& phraseName);
 
 void ClearTerminal();

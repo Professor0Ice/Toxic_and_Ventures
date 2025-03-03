@@ -64,7 +64,7 @@ void Player::load()
 
 void Player::PrintParam()
 {
-    std::wcout << name;
+    std::wcout << emotions[0];
     std::cout << "\n";
     std::wcout << hp;
     std::cout << "\n";
@@ -80,10 +80,12 @@ void Player::setName(std::wstring w)
     name = w;
 }
 
-void Player::getEmotions(int*& emotionsOut, int*& echoEmotionsOut)
+void Player::getEmotions(int* emotionsOut, int* echoEmotionsOut)
 {
-    emotionsOut = emotions;
-    echoEmotionsOut = echo_emotions;
+	for (int i = 0; i < 6; i++) {
+		emotionsOut[i] = emotions[i];
+		echoEmotionsOut[i] = echo_emotions[i];
+	}
 }
 
 void Player::setEmotions(const int newEmotions[6], const int newEchoEmotions[6])
@@ -272,6 +274,9 @@ Entity* Enemy::NextAction()
 
     UpdateStress();
     UpdateStressEm();
+    LoadName();
+    UpdateEmotion();
+    
 
     DrawFrameFromFile(EnemyFileName, EnemyCoord[0], EnemyCoord[1]);
 
@@ -305,10 +310,32 @@ void Enemy::UpdateStress()
 	DrawFrameFromFile("stress" + std::to_string(int(stressPlayer / 10)) + ".txt", 128, 1);
 }
 
+void Enemy::LoadName()
+{
+    std::wstring str = LoadPhrase("name_h") + L" - [color=green]" + player->getName();
+    DrawText(str, 143 + 48/2 - (str.size()-13)/2 - 2, 6);
+}
+
+void Enemy::UpdateEmotion()
+{
+    int emotions[6];
+    int echo_emotions[6];
+    std::wstring str;
+
+    player->getEmotions(emotions, echo_emotions);
+    std::cout << emotions[0];
+
+    for (int i = 0; i < 6 ; i++) {
+        std::cout << "emotion" + std::to_string(i);
+        str = LoadPhrase("emotion" + std::to_string(i)) + L": " + std::to_wstring(emotions[i]) + L"  [color=gray]+" + std::to_wstring(echo_emotions[i]);
+        DrawText(str, 144, 8 + i * 2);
+    }
+}
+
 void Enemy::UpdateStressEm()
 {
-    std::wstring str = LoadPhrase("stress" + std::to_string(int(stressPlayer / 10)));
-    DrawText(str, 133 - (str.size() / 2) - 1 + 38/2, 34);
+	std::wstring str = LoadPhrase("stress" + std::to_string(int(stressPlayer / 10)));
+	DrawText(str, 133 - (str.size() / 2) - 1 + 38 / 2, 34);
 }
 
 Mimik::Mimik()

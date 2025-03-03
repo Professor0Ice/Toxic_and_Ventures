@@ -5,6 +5,10 @@
             "text": "Здесь сам текст - название primer, для тега при поиске из кода"
         },
         {
+            "name": "name_h",
+            "text": "Эмоциональное состояние"
+        },
+        {
             "name": "stress0",
             "text": "    [color=green]: D[/color][color=red][/color]  "
         },
@@ -34,7 +38,7 @@
         },
         {
             "name": "stress7",
-            "text": "   ([color=blue]╥[/color]_[color=blue]╥[/color]) "
+            "text": "   ([color=blue]╥[/color]_[color=blue]╥[/color] ) "
         },
         {
             "name": "stress8",
@@ -43,6 +47,30 @@
         {
             "name": "stress9",
             "text": "  ([color=red]x[/color]_[color=red]x[/color])  "
+        },
+        {
+            "name": "emotion0",
+            "text": "Страх"
+        },
+        {
+            "name": "emotion1",
+            "text": "Злость"
+        },
+        {
+            "name": "emotion2",
+            "text": "Презрение"
+        },
+        {
+            "name": "emotion3",
+            "text": "Радость"
+        },
+        {
+            "name": "emotion4",
+            "text": "Умиротворение"
+        },
+        {
+            "name": "emotion5",
+            "text": "Вдохновение"
         },
         {
             "name": "welcome",

@@ -10,6 +10,21 @@ extern std::string filePathLang = "ru.json";
 
 static bool fullscreen = false;
 
+std::wstring operator*(const std::wstring& str, int n) {
+	if (n <= 0) {
+		return L""; 
+	}
+
+	std::wstring result;
+	result.reserve(str.size() * n); 
+
+	for (int i = 0; i < n; ++i) {
+		result += str; 
+	}
+
+	return result;
+}
+
 //штука для переработки в встринг
 std::wstring Utf8ToWstring(const std::string& str) {
     std::wstring result;
@@ -57,6 +72,7 @@ std::wstring LoadPhrase(const std::string& phraseName) {
             return wstr;
         }
     }
+    std::cout << phraseName << std::endl;
     throw std::runtime_error("Фраза с именем '" + phraseName + "' не найдена.");
 }
 
@@ -182,8 +198,15 @@ void BaseIfTerminal(int& key) {
     else if (key == TK_F11) {
         fullscreen = !fullscreen;
         terminal_set(fullscreen ? "window.fullscreen=true" : "window.fullscreen=false");
-        SetFontSize();
-        LoadScreen();
+        if (!fullscreen) {
+            terminal_set("font: fonts/UbuntuMono-Regular.ttf, size=9");
+			terminal_set("window.size=191x56");
+            LoadScreen();
+        }
+        else {
+            SetFontSize();
+            LoadScreen();
+        }
     }
     else if (key == TK_RESIZED) {
         SetFontSize();

@@ -4,7 +4,8 @@ GameLogic::GameLogic()
 {
 	terminal_open();
 
-    terminal_set("font: fonts/UbuntuMono-Regular.ttf, size=10, codepage=437");
+    terminal_set("font: fonts/UbuntuMono-Regular.ttf, size=9, codepage=437");
+    terminal_set("window.size=191x56");
     terminal_set("window.title='Toxic & Ventures'");
     terminal_set("window.icon='icons/icon.ico'");
     terminal_set("input.encoding = utf-8");
@@ -13,12 +14,13 @@ GameLogic::GameLogic()
     //terminal_set("window.cursor.visible=false");
 
     DrawFrameFromFile("ramka.txt", 0, 0);
-    SetFontSize();
     LoadScreen();
 
     currentEntity = new Mimik();
 
     Player* Gplayer = new Player(1);
+    Gplayer->setName(L"Клоун");
+    Gplayer->PrintParam();
 
     //Тут ещё будет логика меню и настроек
 

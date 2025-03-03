@@ -11,7 +11,7 @@ public:
 	void PrintParam();
 	std::wstring getName() const;
 	void setName(std::wstring w);
-	void getEmotions(int*& emotionsOut, int*& echoEmotionsOut);
+	void getEmotions(int* emotionsOut, int* echoEmotionsOut);
 	void setEmotions(const int newEmotions[6], const int newEchoEmotions[6]);
 	int getHP();
 	void RemoveHP();
@@ -78,6 +78,8 @@ protected:
 	Entity* NextAction() override;
 	void UpdateStress();
 	void UpdateStressEm();
+	void LoadName();
+	void UpdateEmotion();
 };
 
 class Mimik : public Enemy {

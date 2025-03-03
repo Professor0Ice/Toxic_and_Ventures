@@ -8,6 +8,8 @@ std::vector<int> screenTextCoord = {};
 
 extern std::string filePathLang = "ru.json";
 
+static bool fullscreen = false;
+
 //штука для переработки в встринг
 std::wstring Utf8ToWstring(const std::string& str) {
     std::wstring result;
@@ -94,7 +96,7 @@ void SetFontSize() {
     const int height = terminal_state(TK_HEIGHT);
 
     int fontSize = sqrt(width * width + height * height) / 14;
-    if (fontSize < 1) fontSize = 1;  // Минимальный размер шрифта
+    if (fontSize < 2) fontSize = 2;  // Минимальный размер шрифта   WSC 
     const char* w = "font: fonts/UbuntuMono-Regular.ttf, size=";
     char result[128];
 
@@ -117,7 +119,11 @@ void DrawText(std::wstring text, int x, int y) {
     screenTextCoord.push_back(y);
 }
 
-void LoadScreen(std::vector<std::string> screenF, std::vector<int> screenFC, std::vector<int> screenTC, std::vector<std::wstring> screenT) {
+void LoadScreen() {
+    std::vector<std::string> screenF = screenFiles;
+    std::vector<int> screenFC = screenFilesCoord;
+    std::vector<int> screenTC = screenTextCoord;
+    std::vector<std::wstring> screenT = screenText;
     ClearTerminal();
 
     for (int i = 0; i < screenF.size(); i++) {
@@ -140,85 +146,47 @@ std::vector<std::wstring> SplitString(const std::wstring& input) {
     return words;
 }
 
+void CheckResize() {
+    static int lastWidth = terminal_state(TK_WIDTH);
+    static int lastHeight = terminal_state(TK_HEIGHT);
 
-void If_Dialogue(const std::string& phraseName) {
-    ClearTerminal();
-    DrawFrameFromFile("dialogue.txt",0,0);
-    
-    const std::vector<std::wstring> phrase = SplitString(LoadPhrase(phraseName));
-    std::wstring line;
-    int k = 0;
+    int currentWidth = terminal_state(TK_WIDTH);
+    int currentHeight = terminal_state(TK_HEIGHT);
 
-    for (auto i : phrase) {
-        if (line.size() + i.size() >= 138) {
-            DrawText(line, 25, 20+k);
-            k++;
-            line = i + L" ";
-        }
-        else {
-            line += i + L" ";
-        }
-    }
+    if (currentWidth != lastWidth || currentHeight != lastHeight) {
+        std::cout << "Resize detected!" << std::endl;
 
-    if (line.size() != 0){
-        DrawText(line, 26, 20 + k);
-    }
+        terminal_set(L"window.size=191x56"); // Возвращаем размер
+        terminal_refresh();
+        LoadScreen(); // Перерисовываем арт
 
-    line = LoadPhrase("next");
-    DrawText(line,95-line.size()/2, 50);
-
-    int key;
-
-    while (true) {
-
-        key = terminal_read();
-
-        if (key == TK_F11) {
-            static bool fullscreen = false;
-            fullscreen = !fullscreen;
-            terminal_set(fullscreen ? "window.fullscreen=true" : "window.fullscreen=false");
-            SetFontSize();
-            LoadScreen(screenFiles, screenFilesCoord, screenTextCoord, screenText);
-        }
-
-        if (key == TK_ENTER or key == TK_SPACE) {
-            break;
-        }
+        lastWidth = currentWidth;
+        lastHeight = currentHeight;
     }
 }
 
-void OpenTerminal() {
-    terminal_open();
-    terminal_set("font: fonts/UbuntuMono-Regular.ttf, size=10, codepage=437");
-    terminal_set("window.maximized=true");
-    terminal_set("window.title='Toxic & Ventures'");
-    terminal_set("window.icon='icons/icon.ico'");
-    terminal_set("input.encoding = utf-8");
-    terminal_set("window.encoding=437");
-    //terminal_set("window.cursor.visible=false");
+bool IsFullScreen() {
+    int width = terminal_state(TK_WIDTH);      // Ширина окна
+    int height = terminal_state(TK_HEIGHT);    // Высота окна
 
-    DrawFrameFromFile("ramka.txt",0,0);
-    SetFontSize();
-    LoadScreen(screenFiles, screenFilesCoord, screenTextCoord, screenText);
+    // Например, считаем фуллскрином, если размеры больше 80x25
+    return (width == GetSystemMetrics(SM_CXSCREEN) && height == GetSystemMetrics(SM_CYSCREEN));
+}
 
-    int key;
+void BaseIfTerminal(int& key) {
 
-    while (true) {
-
-        key = terminal_read();
-
-        if (key == TK_CLOSE || key == TK_ESCAPE) {
-            break;
-        }
-
-        if (key == TK_F11) {
-            static bool fullscreen = false;
-            fullscreen = !fullscreen;
-            terminal_set(fullscreen ? "window.fullscreen=true" : "window.fullscreen=false");
-            SetFontSize();
-            LoadScreen(screenFiles, screenFilesCoord, screenTextCoord, screenText);
-        }
+    if (key == TK_CLOSE or key == TK_ESCAPE) {
+        terminal_close();
+        exit(0);
     }
-
-    terminal_close();
+    else if (key == TK_F11) {
+        fullscreen = !fullscreen;
+        terminal_set(fullscreen ? "window.fullscreen=true" : "window.fullscreen=false");
+        SetFontSize();
+        LoadScreen();
+    }
+    else if (key == TK_RESIZED) {
+        SetFontSize();
+        LoadScreen();
+    }  
 }

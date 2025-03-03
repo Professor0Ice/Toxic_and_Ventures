@@ -24,10 +24,8 @@ void SetFontSize();
 
 void DrawText(std::wstring text, int x, int y);
 
-void LoadScreen(std::vector<std::string> screenF, std::vector<int> screenFC, std::vector<int> screenTC, std::vector<std::wstring> screenT);
+void LoadScreen();
 
 std::vector<std::wstring> SplitString(const std::wstring& input);
 
-void If_Dialogue(const std::string& phraseName);
-
-void OpenTerminal();
+void BaseIfTerminal(int& key);

@@ -1,20 +1,64 @@
 {
-  "phrases": [
-    {
-      "name": "welcome",
-      "text": "Добро пожаловать в нашу кам зону с бардом и волшебников - здесь вы можете встретить таких знаменитостей, как великий КЛОУН ПАЛЬЯЧИ!!!! хи хи хи ха ха ха ха хуй хуй хуй хуй хуй"
-    },
-	{
-      "name": "next",
-      "text": "Для продолжения нажмите Enter или Space"
-    },
-    {
-      "name": "npc_greeting",
-      "text": "Привет, путник! Как дела?"
-    },
-    {
-      "name": "danger_warning",
-      "text": "Осторожно, впереди опасность!"
-    }
-  ]
+    "phrases": [
+        {
+            "name": "primer",
+            "text": "Здесь сам текст - название primer, для тега при поиске из кода"
+        },
+        {
+            "name": "stress0",
+            "text": "    [color=green]: D[/color][color=red][/color]  "
+        },
+        {
+            "name": "stress1",
+            "text": "    [color=green]: )[/color][color=red][/color]  "
+        },
+        {
+            "name": "stress2",
+            "text": "     [color=green]^[/color]-[color=green]^[/color] "
+        },
+        {
+            "name": "stress3",
+            "text": "   ([color=gray]*[/color]&[color=gray]*[/color]) "
+        },
+        {
+            "name": "stress4",
+            "text": "   ([color=gray]-[/color]_[color=gray]-[/color]) "
+        },
+        {
+            "name": "stress5",
+            "text": "   [color=blue]'[/color]O_O[color=blue]'[/color] "
+        },
+        {
+            "name": "stress6",
+            "text": "  ([color=red]>[/color]_[color=red]<[/color])  "
+        },
+        {
+            "name": "stress7",
+            "text": "   ([color=blue]╥[/color]_[color=blue]╥[/color]) "
+        },
+        {
+            "name": "stress8",
+            "text": "<[color=red]([/color] >O< [color=red])[/color]>"
+        },
+        {
+            "name": "stress9",
+            "text": "  ([color=red]x[/color]_[color=red]x[/color])  "
+        },
+        {
+            "name": "welcome",
+            "text": "Добро пожаловать в нашу кам зону с бардом и волшебников - здесь вы можете встретить таких знаменитостей, как великий КЛОУН ПАЛЬЯЧИ!!!! хи хи хи ха ха ха ха хуй хуй хуй хуй хуй"
+        },
+        {
+            "name": "next",
+            "text": "Для продолжения нажмите Enter или Space"
+        },
+        {
+            "name": "npc_greeting",
+            "text": "Привет, путник! Как дела?"
+        },
+        {
+            "name": "danger_warning",
+            "text": "Осторожно, впереди опасность!"
+        }
+    ]
 }

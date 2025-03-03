@@ -1,0 +1,32 @@
+  [bkcolor=red]░[bkcolor=black]  [bkcolor=red]░░
+ [bkcolor=red]░ ░   ░
+[bkcolor=red]░[bkcolor=orange] ░░░[bkcolor=black]░[bkcolor=red]░░ 
+ [bkcolor=red]░[bkcolor=orange]▄[bkcolor=yellow]░░[bkcolor=orange]▄▄▄[bkcolor=red]░
+▒[bkcolor=#e63244]▒▒     █
+[bkcolor=#e63244]█     ▒ █
+[bkcolor=#e63244]█▄▄▄▄▒▒▄█
+[bkcolor=#e63244]█    ▒  ▒
+[bkcolor=#e63244]▒▒  ▒   █
+[bkcolor=#e63244]█▒▒▄▄▄▄▄█
+[bkcolor=#e63244]█     ▒ █
+[bkcolor=#e63244]█    ▒▒ █
+[bkcolor=#e63244]█▄▄▄▄▄▄▄█
+[bkcolor=#e63244]█   ▒   █
+[bkcolor=#e63244]█  ▒    █
+[bkcolor=#e63244]█▄▄▄▄▄▄▄█
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█▄▄▄▄▄▄▄█
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█▄▄▄▄▄▄▄█
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█▄▄▄▄▄▄▄█
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█▄▄▄▄▄▄▄█
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█       █
+[bkcolor=#e63244]█       █
+ [bkcolor=#e63244]█▄▄▄▄▄█

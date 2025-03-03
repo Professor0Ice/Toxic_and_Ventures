@@ -1,5 +1,6 @@
-#include "Entitys.h"
+п»ї#include "Entitys.h"
 
+int Nkey;
 
 Player::Player(int SaveFileN) {
     filename = "Save" + std::to_string(SaveFileN);
@@ -20,7 +21,7 @@ Player::Player(int SaveFileN) {
     hp = 3;
     MaxArtefacts = 3;
     MaxVanInteract = 2;
-    Phrase = 0; // кол. фраз
+    Phrase = 0; // РєРѕР». С„СЂР°Р·
 }
 
 void Player::save()
@@ -28,14 +29,14 @@ void Player::save()
     getLifeTime();
     std::ofstream ofs(fs::current_path() / FolderName / filename, std::ios::binary);
     if (ofs) {
-        // Сначала записываем размер строки
+        // РЎРЅР°С‡Р°Р»Р° Р·Р°РїРёСЃС‹РІР°РµРј СЂР°Р·РјРµСЂ СЃС‚СЂРѕРєРё
         size_t nameSize = name.size();
         ofs.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
 
-        // Записываем строку как массив байтов
+        // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ РєР°Рє РјР°СЃСЃРёРІ Р±Р°Р№С‚РѕРІ
         ofs.write(reinterpret_cast<const char*>(name.c_str()), nameSize * sizeof(wchar_t));
 
-        // Сериализуем и записываем другие данные
+        // РЎРµСЂРёР°Р»РёР·СѓРµРј Рё Р·Р°РїРёСЃС‹РІР°РµРј РґСЂСѓРіРёРµ РґР°РЅРЅС‹Рµ
         serialize_data(ofs);
     }
 }
@@ -44,11 +45,11 @@ void Player::load()
 {
     std::ifstream ifs(fs::current_path() / FolderName / filename, std::ios::binary);
     if (ifs) {
-        // Считываем размер строки
+        // РЎС‡РёС‚С‹РІР°РµРј СЂР°Р·РјРµСЂ СЃС‚СЂРѕРєРё
         size_t nameSize;
         ifs.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
 
-        // Считываем строку
+        // РЎС‡РёС‚С‹РІР°РµРј СЃС‚СЂРѕРєСѓ
         if (nameSize > 0 && nameSize < 1024) {
             name.clear();
             std::vector<wchar_t> tempName(nameSize);
@@ -56,7 +57,7 @@ void Player::load()
             name = std::wstring(tempName.begin(), tempName.end());
         }
 
-        // Загружаем остальные данные
+        // Р—Р°РіСЂСѓР¶Р°РµРј РѕСЃС‚Р°Р»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ
         deserialize_data(ifs);
     }
 }
@@ -167,11 +168,11 @@ void Player::xor_encrypt_decrypt(char* data, size_t size, char key)
 
 void Player::serialize_data(std::ofstream& ofs)
 {
-    // Сериализуем массив эмоций
+    // РЎРµСЂРёР°Р»РёР·СѓРµРј РјР°СЃСЃРёРІ СЌРјРѕС†РёР№
     ofs.write(reinterpret_cast<char*>(&emotions), sizeof(emotions));
     ofs.write(reinterpret_cast<char*>(&echo_emotions), sizeof(echo_emotions));
 
-    // Сериализуем другие данные
+    // РЎРµСЂРёР°Р»РёР·СѓРµРј РґСЂСѓРіРёРµ РґР°РЅРЅС‹Рµ
     ofs.write(reinterpret_cast<char*>(&hp), sizeof(hp));
     ofs.write(reinterpret_cast<char*>(&MaxArtefacts), sizeof(MaxArtefacts));
 
@@ -181,16 +182,16 @@ void Player::serialize_data(std::ofstream& ofs)
         ofs.write(reinterpret_cast<char*>(artefacts.data()), artefacts_size * sizeof(int));
     }
 
-    // Повторяем это для всех остальных данных...
+    // РџРѕРІС‚РѕСЂСЏРµРј СЌС‚Рѕ РґР»СЏ РІСЃРµС… РѕСЃС‚Р°Р»СЊРЅС‹С… РґР°РЅРЅС‹С…...
 }
 
 void Player::deserialize_data(std::ifstream& ifs)
 {
-    // Десериализуем массив эмоций
+    // Р”РµСЃРµСЂРёР°Р»РёР·СѓРµРј РјР°СЃСЃРёРІ СЌРјРѕС†РёР№
     ifs.read(reinterpret_cast<char*>(&emotions), sizeof(emotions));
     ifs.read(reinterpret_cast<char*>(&echo_emotions), sizeof(echo_emotions));
 
-    // Десериализуем другие данные
+    // Р”РµСЃРµСЂРёР°Р»РёР·СѓРµРј РґСЂСѓРіРёРµ РґР°РЅРЅС‹Рµ
     ifs.read(reinterpret_cast<char*>(&hp), sizeof(hp));
     ifs.read(reinterpret_cast<char*>(&MaxArtefacts), sizeof(MaxArtefacts));
 
@@ -201,7 +202,7 @@ void Player::deserialize_data(std::ifstream& ifs)
         ifs.read(reinterpret_cast<char*>(artefacts.data()), artefacts_size * sizeof(int));
     }
 
-    // Повторяем для остальных данных...
+    // РџРѕРІС‚РѕСЂСЏРµРј РґР»СЏ РѕСЃС‚Р°Р»СЊРЅС‹С… РґР°РЅРЅС‹С…...
 }
 
 void Player::getLifeTime()
@@ -212,15 +213,107 @@ void Player::getLifeTime()
     Time += static_cast<int>(currentSessionLifetime);
 }
 
-Entity::Entity(const std::string& phraseName)
+Entity* Entity::start(Player* playerN)
 {
-    If_Dialogue(phraseName);
-    NextAction();
+    player = playerN;
+
+    // РРЅС‚РµСЂС„РµР№СЃ РґРёР°Р»РѕРіР°
     ClearTerminal();
-    DrawFrameFromFile("ramka.txt",0,0);
+    DrawFrameFromFile("dialogue.txt", 0, 0);
+
+    const std::vector<std::wstring> phrase = SplitString(LoadPhrase(phraseName));
+    std::wstring line;
+    int k = 0;
+
+    for (auto i : phrase) {
+        if (line.size() + i.size() >= 138) {
+            DrawText(line, 25, 20 + k);
+            k++;
+            line = i + L" ";
+        }
+        else {
+            line += i + L" ";
+        }
+    }
+
+    if (line.size() != 0) {
+        DrawText(line, 26, 20 + k);
+    }
+
+    line = LoadPhrase("next");
+    DrawText(line, 95 - line.size() / 2, 50);
+
+    while (true) {
+
+        Nkey = terminal_read();
+
+        BaseIfTerminal(Nkey);
+
+        if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
+            break;
+        }
+    }
+    // РљРѕРЅРµС† РёРЅС‚РµСЂС„РµР№СЃР°
+
+    return NextAction();
 }
 
-void Entity::NextAction()
+Entity* Entity::NextAction()
 {
     std::cout << "Entity is destroyed";
+    return new Entity;
+}
+
+Entity* Enemy::NextAction()
+{
+    // РРЅС‚РµСЂС„РµР№СЃ Р±РѕСЏ
+    ClearTerminal();
+    DrawFrameFromFile("fight interface.txt", 0, 0);
+
+    UpdateStress();
+    UpdateStressEm();
+
+    DrawFrameFromFile(EnemyFileName, EnemyCoord[0], EnemyCoord[1]);
+
+    while (true) {
+
+        Nkey = terminal_read();
+
+        BaseIfTerminal(Nkey);
+
+        if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
+            break;
+        }
+
+		if (Nkey == TK_UP and int(stressPlayer / 10)<9) {
+            stressPlayer += 10;
+            UpdateStress();
+            UpdateStressEm();
+		}
+        if (Nkey == TK_DOWN and int(stressPlayer / 10) > 0) {
+			stressPlayer -= 10;
+			UpdateStress();
+			UpdateStressEm();
+		}
+    }
+    // РљРѕРЅРµС† РёРЅС‚РµСЂС„РµР№СЃР°
+    return new Entity;
+}
+
+void Enemy::UpdateStress()
+{
+	DrawFrameFromFile("stress" + std::to_string(int(stressPlayer / 10)) + ".txt", 128, 1);
+}
+
+void Enemy::UpdateStressEm()
+{
+    std::wstring str = LoadPhrase("stress" + std::to_string(int(stressPlayer / 10)));
+    DrawText(str, 133 - (str.size() / 2) - 1 + 38/2, 34);
+}
+
+Mimik::Mimik()
+{
+	EnemyFileName = "mimik.txt";
+	EnemyCoord[0] = 6;
+	EnemyCoord[1] = 2;
 }

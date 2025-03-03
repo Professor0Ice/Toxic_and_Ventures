@@ -48,7 +48,39 @@ private:
 
 class Entity {
 public:
-	Entity(const std::string& phraseName);
-private:
-	virtual void NextAction();
+	Entity* start(Player* playerN);
+protected:
+	std::string phraseName = "welcome";
+	virtual Entity* NextAction();
+	Player* player;
+};
+
+class Enemy : public Entity {
+protected:
+	std::wstring name;
+	//PhaseName - для описания уже есть
+	std::string EnemyFileName;
+	int EnemyCoord[2];
+
+	//std::vector<EnemyAttack> Attack; // - в будущем для задачи возможных атак
+	std::vector<int> NumAttack; // - для задачи количества атак
+
+	int stress; // - начальное количество стресса в процентах
+	int stressPlayer = 0;
+
+	int emotionLut[6]; // - макс награда эмоций
+	//std::vector<artefact>; // - какие артефакты могут выпасть
+
+	//std::vector<enchant>; // - зачарование монстра
+
+	//std::vector<PlayerAttack>; // Атаки игрока с дабл уроном
+
+	Entity* NextAction() override;
+	void UpdateStress();
+	void UpdateStressEm();
+};
+
+class Mimik : public Enemy {
+public:
+	Mimik();
 };

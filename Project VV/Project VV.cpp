@@ -2,10 +2,7 @@
 #include "GameLogic.h"
 
 int main() {
-    Player player(1);
-    player.save();
-    player.PrintParam();
-    OpenTerminal();
+    GameLogic game;
     return 0;
 }
 

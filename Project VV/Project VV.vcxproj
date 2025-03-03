@@ -140,7 +140,6 @@
     <ClInclude Include="Entitys.h" />
     <ClInclude Include="GameLogic.h" />
     <ClInclude Include="Head\BearLibTerminal.h" />
-    <ClInclude Include="include\BearLibTerminal.h" />
     <ClInclude Include="Render.h" />
   </ItemGroup>
   <ItemGroup>

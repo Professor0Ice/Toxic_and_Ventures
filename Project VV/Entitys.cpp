@@ -284,6 +284,9 @@ Entity* Enemy::NextAction()
     UpdateStressEm();
     LoadName();
     UpdateEmotion();
+    LoadArtefacts();
+    LoadBonus();
+    LoadEnemyInfo();
     
 
     DrawFrameFromFile(EnemyFileName, EnemyCoord[0], EnemyCoord[1]);
@@ -354,7 +357,40 @@ void Enemy::UpdateStress()
 void Enemy::LoadName()
 {
     std::wstring str = LoadPhrase("name_h") + L" - [color=green]" + player->getName();
-    DrawText(str, 139 + 52/2 - (str.size()-13)/2 - 4, 6);
+    DrawText(str, 139 + 52/2 - (str.size()-13)/2 - 4, 4);
+    LoadHP();
+}
+
+void Enemy::LoadHP()
+{
+	std::wstring str = LoadPhrase("hp") + L": " + std::to_wstring(player->getHP());
+	DrawText(str, 139 + 52 / 2 - (str.size()) / 2 - 4, 6);
+}
+
+void Enemy::LoadArtefacts()
+{
+    std::wstring str;
+
+    str = LoadPhrase("artefacts");
+    DrawText(str, 170 + 18 / 2 - (str.size() +1 ) / 2, 9);
+
+    for (auto i : player->getArtefacts()) {
+        //потом реализую - пока нет класса артефактов
+        str = L"Хи-хи-ха";
+        DrawText(str, 170 + 18 / 2 - (str.size()) / 2, 11);
+    }
+    str = L"Хи-хи-ха";
+    DrawText(str, 170 + 18 / 2 - (str.size()) / 2 , 11);
+}
+
+void Enemy::LoadBonus()
+{
+    DrawText(LoadPhrase("bonus") + L":", 142, 20);
+}
+
+void Enemy::LoadEnemyInfo()
+{
+    DrawText(LoadPhrase(TagName), 3 + 47/2 - (LoadPhrase(TagName).size() - 15 )/2 , 38);
 }
 
 void Enemy::UpdateEmotion()
@@ -366,10 +402,14 @@ void Enemy::UpdateEmotion()
     player->getEmotions(emotions, echo_emotions);
     std::cout << emotions[0];
 
+    str = LoadPhrase("emotionSum") + L": " + std::to_wstring(emotions[0] + emotions[1] + emotions[2] + emotions[3] + emotions[4] + emotions[5] +
+        echo_emotions[0] + echo_emotions[1] + echo_emotions[2] + echo_emotions[3] + echo_emotions[4] + echo_emotions[5]);
+	DrawText(str, 142, 9);
+
     for (int i = 0; i < 6 ; i++) {
         std::cout << "emotion" + std::to_string(i);
         str = LoadPhrase("emotion" + std::to_string(i)) + L": " + std::to_wstring(emotions[i]) + L"  [color=gray]+" + std::to_wstring(echo_emotions[i]);
-        DrawText(str, 141, 11 + i * 2);
+        DrawText(str, 142, 11 + i + int(i>=3) );
     }
 }
 
@@ -383,6 +423,7 @@ void Enemy::UpdateStressEm()
 
 Mimik::Mimik()
 {
+    TagName = "mimik";
 	EnemyFileName = "mimik.txt";
 	EnemyCoord[0] = 6;
 	EnemyCoord[1] = 2;

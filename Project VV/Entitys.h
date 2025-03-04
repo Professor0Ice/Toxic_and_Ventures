@@ -57,7 +57,7 @@ protected:
 
 class Enemy : public Entity {
 protected:
-	std::wstring name;
+	std::string TagName;
 	//PhaseName - для описания уже есть
 	std::string EnemyFileName;
 	int EnemyCoord[2];
@@ -83,6 +83,10 @@ protected:
 	void UpdateStressEm();
 	void LoadName();
 	void UpdateEmotion();
+	void LoadHP();
+	void LoadArtefacts();
+	void LoadBonus();
+	void LoadEnemyInfo();
 };
 
 class Mimik : public Enemy {

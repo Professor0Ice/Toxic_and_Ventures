@@ -5,6 +5,7 @@ std::vector<std::string> screenFiles = {};
 std::vector<int> screenFilesCoord = {};
 std::vector<std::wstring> screenText = {};
 std::vector<int> screenTextCoord = {};
+std::vector<std::wstring> replaceText = {};
 
 extern std::string filePathLang = "ru.json";
 
@@ -83,6 +84,7 @@ void ClearTerminal() {
     screenFilesCoord.clear();
     screenText.clear();
     screenTextCoord.clear();
+    replaceText.clear();
     terminal_clear();
 }
 
@@ -91,6 +93,7 @@ void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh, 
     screenFiles.push_back(filename);
     screenFilesCoord.push_back(x);
     screenFilesCoord.push_back(y);
+    replaceText.push_back(replace);
 
     std::ifstream file(path.string());
     if (!file.is_open()) {
@@ -147,10 +150,12 @@ void LoadScreen() {
     std::vector<int> screenFC = screenFilesCoord;
     std::vector<int> screenTC = screenTextCoord;
     std::vector<std::wstring> screenT = screenText;
+    std::vector<std::wstring> replaceT = replaceText;
+
     ClearTerminal();
 
     for (int i = 0; i < screenF.size(); i++) {
-        DrawFrameFromFile(screenF[i], screenFC[i * 2], screenFC[i * 2 + 1]);
+        DrawFrameFromFile(screenF[i], screenFC[i * 2], screenFC[i * 2 + 1], true, replaceT[i]);
     }
     for (int i = 0; i < screenT.size(); i++) {
         DrawText(screenT[i], screenTC[i * 2], screenTC[i * 2 + 1]);

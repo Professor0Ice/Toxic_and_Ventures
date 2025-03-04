@@ -390,7 +390,22 @@ void Enemy::LoadBonus()
 
 void Enemy::LoadEnemyInfo()
 {
-    DrawText(LoadPhrase(TagName), 3 + 47/2 - (LoadPhrase(TagName).size() - 15 )/2 , 38);
+    std::wstring str;
+    str = LoadPhrase(TagName);
+    DrawText(str, 3 + 42/2 - (str.size() - 15 )/2 -1, 38);
+
+    str = LoadPhrase("En_stress") + L": " + LoadPhrase("En_stress" + std::to_string(int(stress/20+1)));
+    DrawText(str, 3 + 42 / 2 - (str.size()) / 2 - 1, 40);
+
+	str = LoadPhrase("En_def") + L": " + LoadPhrase("En_def" + std::to_string(int(def / 20 +1)));
+	DrawText(str, 3 + 42 / 2 - (str.size()) / 2 - 1, 41);
+
+	str = LoadPhrase("En_dod") + L": " + LoadPhrase("En_dod" + std::to_string(int(dodge / 20 +1)));
+	DrawText(str, 3 + 42 / 2 - (str.size()) / 2 - 1, 42);
+
+	str = LoadPhrase("En_bonus") + L":";
+	DrawText(str, 3 + 42 / 2 - (str.size()) / 2 - 1, 44);
+
 }
 
 void Enemy::UpdateEmotion()
@@ -427,4 +442,7 @@ Mimik::Mimik()
 	EnemyFileName = "mimik.txt";
 	EnemyCoord[0] = 6;
 	EnemyCoord[1] = 2;
+    stress = 60;
+    dodge = 30;
+    def = 0;
 }

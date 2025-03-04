@@ -65,7 +65,9 @@ protected:
 	//std::vector<EnemyAttack> Attack; // - в будущем для задачи возможных атак
 	std::vector<int> NumAttack; // - для задачи количества атак
 
-	int stress; // - начальное количество стресса в процентах
+	int stress; 
+	int def;
+	int dodge;
 
 	int stressPlayer = 0;
 	int DefendPlayer = 0;

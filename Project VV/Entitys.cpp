@@ -2,6 +2,14 @@
 
 int Nkey;
 
+std::wstring dodgeColor[5] = {
+	L"#aa1803",
+	L"#bd613c",
+	L"#dd6722",
+	L"#6d8c00",
+	L"#1a512e"
+};
+
 Player::Player(int SaveFileN) {
     filename = "Save" + std::to_string(SaveFileN);
 
@@ -290,13 +298,33 @@ Entity* Enemy::NextAction()
             break;
         }
 
-		if (Nkey == TK_UP and int(stressPlayer / 10)<9) {
+		if (Nkey == TK_UP) {
             stressPlayer += 10;
             UpdateStress();
             UpdateStressEm();
 		}
-        if (Nkey == TK_DOWN and int(stressPlayer / 10) > 0) {
+        if (Nkey == TK_DOWN) {
 			stressPlayer -= 10;
+			UpdateStress();
+			UpdateStressEm();
+		}
+		if (Nkey == TK_W) {
+            DefendPlayer += 10;
+			UpdateStress();
+			UpdateStressEm();
+		}
+		if (Nkey == TK_S) {
+            DefendPlayer -= 10;
+			UpdateStress();
+			UpdateStressEm();
+		}
+		if (Nkey == TK_A) {
+			DodgePlayer += 20;
+			UpdateStress();
+			UpdateStressEm();
+		}
+		if (Nkey == TK_D) {
+			DodgePlayer -= 20;
 			UpdateStress();
 			UpdateStressEm();
 		}
@@ -307,13 +335,26 @@ Entity* Enemy::NextAction()
 
 void Enemy::UpdateStress()
 {
-	DrawFrameFromFile("stress" + std::to_string(int(stressPlayer / 10)) + ".txt", 128, 1);
+    std::wstring Color = dodgeColor[0];
+
+	if (DodgePlayer > -1) {
+        if (DodgePlayer < 100) { Color = dodgeColor[int(DodgePlayer / 20)]; }
+		else { Color = dodgeColor[4]; }
+	}
+    if ((stressPlayer > -1 and stressPlayer < 99)) {
+        DrawFrameFromFile("stress" + std::to_string(int(stressPlayer / 10)) + ".txt", 128, 1, false, Color);
+    }
+	if (DefendPlayer > -1) {
+		if (DefendPlayer < 101) { DrawFrameFromFile("Dstress" + std::to_string(int(DefendPlayer / 10)) + ".txt", 128, 1, false); }
+		else { DrawFrameFromFile("Dstress10.txt", 128, 1, false); }
+	}
+    terminal_refresh();
 }
 
 void Enemy::LoadName()
 {
     std::wstring str = LoadPhrase("name_h") + L" - [color=green]" + player->getName();
-    DrawText(str, 143 + 48/2 - (str.size()-13)/2 - 2, 6);
+    DrawText(str, 139 + 52/2 - (str.size()-13)/2 - 4, 6);
 }
 
 void Enemy::UpdateEmotion()
@@ -328,14 +369,16 @@ void Enemy::UpdateEmotion()
     for (int i = 0; i < 6 ; i++) {
         std::cout << "emotion" + std::to_string(i);
         str = LoadPhrase("emotion" + std::to_string(i)) + L": " + std::to_wstring(emotions[i]) + L"  [color=gray]+" + std::to_wstring(echo_emotions[i]);
-        DrawText(str, 144, 8 + i * 2);
+        DrawText(str, 141, 11 + i * 2);
     }
 }
 
 void Enemy::UpdateStressEm()
 {
-	std::wstring str = LoadPhrase("stress" + std::to_string(int(stressPlayer / 10)));
-	DrawText(str, 133 - (str.size() / 2) - 1 + 38 / 2, 34);
+    if (stressPlayer > -1 and stressPlayer < 99) {
+		std::wstring str = LoadPhrase("stress" + std::to_string(int(stressPlayer / 10)));
+		DrawText(str, 133 - (str.size() / 2) - 1 + 38 / 2, 34);
+	}
 }
 
 Mimik::Mimik()

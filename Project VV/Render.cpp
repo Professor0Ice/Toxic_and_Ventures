@@ -8,6 +8,8 @@ std::vector<int> screenTextCoord = {};
 
 extern std::string filePathLang = "ru.json";
 
+std::wregex pattern(L"J");
+
 static bool fullscreen = false;
 
 std::wstring operator*(const std::wstring& str, int n) {
@@ -84,7 +86,7 @@ void ClearTerminal() {
     terminal_clear();
 }
 
-void DrawFrameFromFile(const std::string& filename, int x, int y) {
+void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh, std::wstring replace) {
     fs::path path = fs::current_path() / "Interfaces" / filename;
     screenFiles.push_back(filename);
     screenFilesCoord.push_back(x);
@@ -100,11 +102,16 @@ void DrawFrameFromFile(const std::string& filename, int x, int y) {
     while (std::getline(file, line)) {
         // ѕреобразуем прочитанную строку из UTF-8 в std::wstring
         std::wstring wline = Utf8ToWstring(line);
+
+        if (replace.size() > 0) {
+            wline = std::regex_replace(wline, pattern, replace);
+        }
+
         terminal_print(x, y++, wline.c_str());
         if (y >= terminal_state(TK_HEIGHT))
             break;
     }
-    terminal_refresh();
+    if (refresh) { terminal_refresh(); }
 }
 
 void SetFontSize() {

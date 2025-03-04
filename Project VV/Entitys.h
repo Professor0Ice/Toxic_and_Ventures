@@ -66,7 +66,10 @@ protected:
 	std::vector<int> NumAttack; // - для задачи количества атак
 
 	int stress; // - начальное количество стресса в процентах
+
 	int stressPlayer = 0;
+	int DefendPlayer = 0;
+	int DodgePlayer = 0;
 
 	int emotionLut[6]; // - макс награда эмоций
 	//std::vector<artefact>; // - какие артефакты могут выпасть

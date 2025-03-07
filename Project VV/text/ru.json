@@ -85,6 +85,10 @@
             "text": "Вдохновение"
         },
         {
+            "name": "phrase_enter",
+            "text": "Сказануть"
+        },
+        {
             "name": "emotionSum",
             "text": "Всего эмоций"
         },
@@ -171,6 +175,18 @@
         {
             "name": "next",
             "text": "Для продолжения нажмите Enter или Space"
+        },
+        {
+            "name": "button_battle1",
+            "text": "Разговор"
+        },
+        {
+            "name": "button_battle2",
+            "text": "Предметы"
+        },
+        {
+            "name": "button_battle3",
+            "text": "Изучение"
         },
         {
             "name": "npc_greeting",

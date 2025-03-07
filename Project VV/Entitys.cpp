@@ -1,7 +1,6 @@
 ﻿#include "Entitys.h"
 
-int Nkey;
-
+int emotionPhrase[6] = { 0,0,0,0,0,0 };
 std::wstring dodgeColor[5] = {
 	L"#aa1803",
 	L"#bd613c",
@@ -9,6 +8,8 @@ std::wstring dodgeColor[5] = {
 	L"#6d8c00",
 	L"#1a512e"
 };
+int NumButton = 0;
+int LRbutton = 0;
 
 Player::Player(int SaveFileN) {
     filename = "Save" + std::to_string(SaveFileN);
@@ -169,6 +170,16 @@ int Player::getTime()
     return Time;
 }
 
+int Player::getMaxEmotion()
+{
+    return MaxEmotion;
+}
+
+void Player::setMaxEmotion(int max)
+{
+    MaxEmotion = max;
+}
+
 void Player::xor_encrypt_decrypt(char* data, size_t size, char key)
 {
     for (size_t i = 0; i < size; ++i) {
@@ -225,6 +236,8 @@ void Player::getLifeTime()
 
 Entity* Entity::start(Player* playerN)
 {
+    int Nkey;
+
     player = playerN;
 
     // Интерфейс диалога
@@ -276,6 +289,10 @@ Entity* Entity::NextAction()
 
 Entity* Enemy::NextAction()
 {
+    int Nkey;
+    int sum;
+    bool focus = false;
+
     // Интерфейс боя
     ClearTerminal();
     DrawFrameFromFile("fight interface.txt", 0, 0);
@@ -287,6 +304,7 @@ Entity* Enemy::NextAction()
     LoadArtefacts();
     LoadBonus();
     LoadEnemyInfo();
+    UpdateButton();
     
 
     DrawFrameFromFile(EnemyFileName, EnemyCoord[0], EnemyCoord[1]);
@@ -297,40 +315,88 @@ Entity* Enemy::NextAction()
 
         BaseIfTerminal(Nkey);
 
-        if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
-            break;
-        }
+		if (Nkey == TK_DOWN) {
+            if (NumButton < 4) {
+                focus = false;
+                NumButton++;
+                UpdateButton();
+                DrawFrameFromFile("fight action.txt",45,36);
+            }
+		}
+        if (Nkey == TK_UP) {
+            if (NumButton > 1) {
+                focus = false;
+				NumButton--;
+				UpdateButton();
+                DrawFrameFromFile("fight action.txt", 45, 36);
+			}
+		}
 
-		if (Nkey == TK_UP) {
-            stressPlayer += 10;
-            UpdateStress();
-            UpdateStressEm();
+		if (Nkey == TK_LEFT) {
+			if (focus) {
+				switch (NumButton) {
+				case 1:
+                    if (LRbutton > 0) {
+                        LRbutton--;
+                        LoadEmotionV();
+                    }
+					break;
+				default:
+					break;
+				}
+			}
 		}
-        if (Nkey == TK_DOWN) {
-			stressPlayer -= 10;
-			UpdateStress();
-			UpdateStressEm();
+		if (Nkey == TK_RIGHT) {
+			if (focus) {
+				switch (NumButton) {
+				case 1:
+					if (LRbutton < 6) {
+						LRbutton++;
+						LoadEmotionV();
+					}
+					break;
+				default:
+					break;
+				}
+			}
 		}
-		if (Nkey == TK_W) {
-            DefendPlayer += 10;
-			UpdateStress();
-			UpdateStressEm();
+
+		if (Nkey == TK_ENTER or Nkey==TK_SPACE) {
+			if(!focus){
+				switch (NumButton) {
+				case 1:
+                    focus = true;
+					LRbutton = 4;
+					LoadEmotionV();
+					break;
+				default:
+					break;
+				}
+			}
+            else {
+				switch (NumButton) {
+				case 1:
+					sum = 0;
+					for (auto i : emotionPhrase) {
+						sum += i;
+					}
+					if (sum < player->getMaxEmotion()) {
+						emotionPhrase[LRbutton] += 1;
+						LoadEmotionV();
+					}
+					break;
+				default:
+					break;
+				}
+            }
 		}
-		if (Nkey == TK_S) {
-            DefendPlayer -= 10;
-			UpdateStress();
-			UpdateStressEm();
-		}
-		if (Nkey == TK_A) {
-			DodgePlayer += 20;
-			UpdateStress();
-			UpdateStressEm();
-		}
-		if (Nkey == TK_D) {
-			DodgePlayer -= 20;
-			UpdateStress();
-			UpdateStressEm();
-		}
+
+        if (Nkey == TK_BACKSPACE or Nkey == TK_DELETE) {
+            if (focus and NumButton == 1 and emotionPhrase[LRbutton] != 0) {
+				emotionPhrase[LRbutton] -= 1;
+				LoadEmotionV();
+            }
+        }
     }
     // Конец интерфейса
     return new Entity;
@@ -357,7 +423,7 @@ void Enemy::UpdateStress()
 void Enemy::LoadName()
 {
     std::wstring str = LoadPhrase("name_h") + L" - [color=green]" + player->getName();
-    DrawText(str, 139 + 52/2 - (str.size()-13)/2 - 4, 4);
+    DrawText(str, 139 + 52/2 - (str.size()-13)/2 - 4, 5);
     LoadHP();
 }
 
@@ -392,24 +458,122 @@ void Enemy::LoadEnemyInfo()
 {
     std::wstring str;
     str = LoadPhrase(TagName);
-    DrawText(str, 3 + 42/2 - (str.size() - 15 )/2 -1, 38);
+    DrawText(str, 3 + 38/2 - (str.size() - 15 )/2 -2, 38);
 
     str = LoadPhrase("En_stress") + L": " + LoadPhrase("En_stress" + std::to_string(int(stress/20+1)));
-    DrawText(str, 3 + 42 / 2 - (str.size()) / 2 - 1, 40);
+    DrawText(str, 3 + 38 / 2 - (str.size()) / 2 - 2, 40);
 
 	str = LoadPhrase("En_def") + L": " + LoadPhrase("En_def" + std::to_string(int(def / 20 +1)));
-	DrawText(str, 3 + 42 / 2 - (str.size()) / 2 - 1, 41);
+	DrawText(str, 3 + 38 / 2 - (str.size()) / 2 - 2, 41);
 
 	str = LoadPhrase("En_dod") + L": " + LoadPhrase("En_dod" + std::to_string(int(dodge / 20 +1)));
-	DrawText(str, 3 + 42 / 2 - (str.size()) / 2 - 1, 42);
+	DrawText(str, 3 + 38 / 2 - (str.size()) / 2 - 2, 42);
 
 	str = LoadPhrase("En_bonus") + L":";
-	DrawText(str, 3 + 42 / 2 - (str.size()) / 2 - 1, 44);
+	DrawText(str, 3 + 38 / 2 - (str.size()) / 2 - 2, 44);
 
 }
 
-void Enemy::UpdateEmotion()
+void Enemy::LoadButton()
 {
+    std::wstring str;
+    for (int i = 0; i < 3; i++) {
+        str = LoadPhrase("button_battle" + std::to_string(i+1));
+
+        DrawFrameFromFile("button_battle.txt",157,36+i*5, false);
+        DrawText(str, 163 + 24 / 2 - (str.size()) / 2, 38+i*5);
+    }
+    DrawFrameFromFile("button_battle_ext.txt", 157, 51);
+}
+
+void Enemy::UpdateButton()
+{
+    std::wstring str;
+
+    if (NumButton == 0) {
+        LoadButton();
+        terminal_refresh();
+    }
+    else {
+        LoadButton();
+		if(NumButton<4){
+            DrawFrameFromFile("button_battle_act.txt", 157, 36 + (NumButton - 1) * 5, false);
+			str = LoadPhrase("button_battle" + std::to_string(NumButton));
+			DrawText(str, 163 + 24 / 2 - (str.size()) / 2, 38 + (NumButton-1) * 5);
+		}
+        else {
+            DrawFrameFromFile("button_battle_ext_act.txt", 157, 36 + (NumButton - 1) * 5, false);
+        }
+        terminal_refresh();
+    }
+}
+
+void Enemy::LoadEmotionV()
+{
+	std::vector<std::wstring> phrases;
+    std::wstring plus = L"+";
+
+	for (int i = 0; i < 6; i++) {
+		phrases.push_back(LoadPhrase("emotion" + std::to_string(i)));
+	}
+	phrases.push_back(LoadPhrase("phrase_enter"));
+
+	int totalWordsLength = 0;
+	for (const auto& word : phrases) {
+		totalWordsLength += word.size();
+	}
+
+	int availableSpace = 98 - totalWordsLength;
+	int numGaps = phrases.size() - 1;
+	int gapSize = (numGaps > 0 && availableSpace > 0) ? (availableSpace / numGaps) : 0;
+
+	int posX = 49;
+
+    phrases[LRbutton] = L"[color=#D9C906]" + phrases[LRbutton];
+    for (int i = 0; i < 6; i++) {
+		DrawText(phrases[i], posX, 50);
+        DrawText(plus*emotionPhrase[i]+L" ", posX, 51);
+
+        posX += phrases[i].size() + gapSize -15*(LRbutton == i);
+	}
+    DrawText(phrases[6], posX, 50);
+
+    UpdateEmotionVisual();
+}
+
+void Enemy::UpdateEmotionVisual()
+{
+    int count = player->getMaxEmotion();
+    std::string str;
+	std::wstring c[7] = 
+    { 
+        L"#FFFFFF",
+		L"#AA1712",
+		L"#3739B0",
+		L"#5C781B",
+		L"#FFC936",
+		L"#60DAE1",
+		L"#AE6BDE",
+    };
+    std::vector<int> ci;
+
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < emotionPhrase[i]; j++) {
+            ci.push_back(i+1);
+        }
+    }
+    while (ci.size() < player->getMaxEmotion()){
+        ci.push_back(0);
+    }
+    
+    for (int i = 0; i < count; i++) {
+        str = "emo_" + std::to_string(count - 2) + "_"  + std::to_string(i + 1) + ".txt";
+        DrawFrameFromFile(str, 84, 39, false, c[ci[i]]);
+    }
+    terminal_refresh();
+}
+
+void Enemy::UpdateEmotion(){
     int emotions[6];
     int echo_emotions[6];
     std::wstring str;
@@ -440,8 +604,8 @@ Mimik::Mimik()
 {
     TagName = "mimik";
 	EnemyFileName = "mimik.txt";
-	EnemyCoord[0] = 6;
-	EnemyCoord[1] = 2;
+	EnemyCoord[0] = 1;
+	EnemyCoord[1] = 0;
     stress = 60;
     dodge = 30;
     def = 0;

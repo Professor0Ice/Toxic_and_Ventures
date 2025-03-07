@@ -26,11 +26,14 @@ public:
 	int getPhrase();
 	void AdditionPhase(int phaseNew);
 	int getTime();
+	int getMaxEmotion();
+	void setMaxEmotion(int max);
 private:
 	std::string filename;
 	std::wstring name;
 	int emotions[6];
 	int echo_emotions[6];
+	int MaxEmotion;
 	int hp;
 	int MaxArtefacts;
 	std::vector<int> artefacts;
@@ -65,13 +68,13 @@ protected:
 	//std::vector<EnemyAttack> Attack; // - в будущем для задачи возможных атак
 	std::vector<int> NumAttack; // - для задачи количества атак
 
-	int stress; 
-	int def;
-	int dodge;
+	int stress = 60; 
+	int def = 30;
+	int dodge = 72;
 
-	int stressPlayer = 0;
-	int DefendPlayer = 0;
-	int DodgePlayer = 0;
+	int stressPlayer = 60;
+	int DefendPlayer = 30;
+	int DodgePlayer = 72;
 
 	int emotionLut[6]; // - макс награда эмоций
 	//std::vector<artefact>; // - какие артефакты могут выпасть
@@ -89,6 +92,10 @@ protected:
 	void LoadArtefacts();
 	void LoadBonus();
 	void LoadEnemyInfo();
+	void LoadButton();
+	void UpdateButton();
+	void LoadEmotionV();
+	void UpdateEmotionVisual();
 };
 
 class Mimik : public Enemy {

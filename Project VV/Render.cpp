@@ -121,23 +121,31 @@ void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh, 
 }
 
 void SetFontSize() {
-    const int width = terminal_state(TK_WIDTH);
-    const int height = terminal_state(TK_HEIGHT);
+	const int cellCountX = 191;
+	const int cellCountY = 56;
 
-    int fontSize = sqrt(width * width + height * height) / 14;
-    if (fontSize < 2) fontSize = 2;  // Минимальный размер шрифта   WSC 
-    const char* w = "font: fonts/UbuntuMono-Regular.ttf, size=";
-    char result[128];
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    snprintf(result, sizeof(result), "%s%d", w, fontSize);
+	// Вычисляем размер ячейки
+	int cellWidth = screenWidth / cellCountX;
+	int cellHeight = screenHeight / cellCountY;
 
-    terminal_set(result);
-    terminal_set("window.size=191x56");
+	// Пробуем подобрать максимально возможный размер шрифта (примерно)
+	int fontSize = min(cellHeight, cellWidth*1.5); // Коэффициент 2 — потому что шрифт обычно выше, чем шире
 
-    std::cout << result;
-    std::cout << "\n";
-    std::cout << fontSize;
-    std::cout << "\n";
+	// Собираем команду
+	std::string fontCmd = "font: fonts/UbuntuMono-Regular.ttf, size=" + std::to_string(fontSize);
+	std::string cellSizeCmd = "window.cellsize=" + std::to_string(cellWidth) + "x" + std::to_string(cellHeight);
+	std::string winSizeCmd = "window.size=" + std::to_string(cellCountX) + "x" + std::to_string(cellCountY);
+
+	// Установка параметров
+	terminal_set(fontCmd.c_str());
+	terminal_set(cellSizeCmd.c_str());
+	terminal_set(winSizeCmd.c_str());
+
+	std::cout << "[DEBUG] " << fontCmd << "\n";
+	std::cout << "[DEBUG] " << cellSizeCmd << "\n";
 }
 
 void DrawText(std::wstring text, int x, int y, bool Memory) {
@@ -218,8 +226,7 @@ void BaseIfTerminal(int& key) {
         fullscreen = !fullscreen;
         terminal_set(fullscreen ? "window.fullscreen=true" : "window.fullscreen=false");
         if (!fullscreen) {
-            terminal_set("font: fonts/UbuntuMono-Regular.ttf, size=9");
-			terminal_set("window.size=191x56");
+            SetFontSize();
             LoadScreen();
         }
         else {

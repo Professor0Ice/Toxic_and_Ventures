@@ -10,6 +10,12 @@ std::wstring dodgeColor[5] = {
 };
 int NumButton = 0;
 int LRbutton = 0;
+int MaxLRbutton = 0;
+int MinLRbutton = 0;
+
+void delay(int milliseconds) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
 
 Player::Player(int SaveFileN) {
     filename = "Save" + std::to_string(SaveFileN);
@@ -180,6 +186,16 @@ void Player::setMaxEmotion(int max)
     MaxEmotion = max;
 }
 
+int Player::getModD20()
+{
+    return ModD20;
+}
+
+void Player::setModD20(int Mod)
+{
+    ModD20 = Mod;
+}
+
 void Player::xor_encrypt_decrypt(char* data, size_t size, char key)
 {
     for (size_t i = 0; i < size; ++i) {
@@ -292,19 +308,20 @@ Entity* Enemy::NextAction()
     int Nkey;
     int sum;
     bool focus = false;
+    bool UpDown = true;
 
     // Интерфейс боя
-    ClearTerminal();
-    DrawFrameFromFile("fight interface.txt", 0, 0);
+	ClearTerminal();
+	DrawFrameFromFile("fight interface.txt", 0, 0);
 
-    UpdateStress();
-    UpdateStressEm();
-    LoadName();
-    UpdateEmotion();
-    LoadArtefacts();
-    LoadBonus();
-    LoadEnemyInfo();
-    UpdateButton();
+	UpdateStress();
+	UpdateStressEm();
+	LoadName();
+	UpdateEmotion();
+	LoadArtefacts();
+	LoadBonus();
+	LoadEnemyInfo();
+	UpdateButton();
     
 
     DrawFrameFromFile(EnemyFileName, EnemyCoord[0], EnemyCoord[1]);
@@ -316,19 +333,19 @@ Entity* Enemy::NextAction()
         BaseIfTerminal(Nkey);
 
 		if (Nkey == TK_DOWN) {
-            if (NumButton < 4) {
+            if (NumButton < 4 and UpDown) {
                 focus = false;
                 NumButton++;
                 UpdateButton();
-                DrawFrameFromFile("fight action.txt",45,36);
+                ClearAction();
             }
 		}
         if (Nkey == TK_UP) {
-            if (NumButton > 1) {
+            if (NumButton > 1 and UpDown) {
                 focus = false;
 				NumButton--;
 				UpdateButton();
-                DrawFrameFromFile("fight action.txt", 45, 36);
+                ClearAction();
 			}
 		}
 
@@ -336,7 +353,7 @@ Entity* Enemy::NextAction()
 			if (focus) {
 				switch (NumButton) {
 				case 1:
-                    if (LRbutton > 0) {
+                    if (LRbutton > MinLRbutton -1) {
                         LRbutton--;
                         LoadEmotionV();
                     }
@@ -350,7 +367,7 @@ Entity* Enemy::NextAction()
 			if (focus) {
 				switch (NumButton) {
 				case 1:
-					if (LRbutton < 6) {
+					if (LRbutton < MaxLRbutton - 1) {
 						LRbutton++;
 						LoadEmotionV();
 					}
@@ -366,6 +383,8 @@ Entity* Enemy::NextAction()
 				switch (NumButton) {
 				case 1:
                     focus = true;
+                    MinLRbutton = 1;
+                    MaxLRbutton = 7;
 					LRbutton = 4;
 					LoadEmotionV();
 					break;
@@ -380,10 +399,20 @@ Entity* Enemy::NextAction()
 					for (auto i : emotionPhrase) {
 						sum += i;
 					}
-					if (sum < player->getMaxEmotion()) {
-						emotionPhrase[LRbutton] += 1;
-						LoadEmotionV();
+
+                    if (LRbutton < 6) {
+						if (sum < player->getMaxEmotion()) {
+							emotionPhrase[LRbutton] += 1;
+							LoadEmotionV();
+						}
 					}
+
+                    else  if(LRbutton == 6 and sum > 0){
+                        UpDown = false;
+                        ClearAction();
+                        RollD20();
+                    }
+
 					break;
 				default:
 					break;
@@ -392,7 +421,7 @@ Entity* Enemy::NextAction()
 		}
 
         if (Nkey == TK_BACKSPACE or Nkey == TK_DELETE) {
-            if (focus and NumButton == 1 and emotionPhrase[LRbutton] != 0) {
+            if (focus and NumButton == 1 and emotionPhrase[LRbutton] != 0 and LRbutton!=7) {
 				emotionPhrase[LRbutton] -= 1;
 				LoadEmotionV();
             }
@@ -571,6 +600,87 @@ void Enemy::UpdateEmotionVisual()
         DrawFrameFromFile(str, 84, 39, false, c[ci[i]]);
     }
     terminal_refresh();
+}
+
+void Enemy::ClearAction()
+{
+    std::wstring space = L" ";
+	for (int i = 0; i < 17; i++) {
+		DrawText(space * 106, 45, 37 + i);
+	}
+    DrawFrameFromFile("fight action.txt",45,36);
+}
+
+std::vector<int> generateShuffledArray(int n) {
+	std::vector<int> arr(n);
+	for (int i = 0; i < n; ++i) {
+		arr[i] = i + 1;
+	}
+
+	std::random_device rd;
+	std::seed_seq seed{ rd(), static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) };
+	std::mt19937 g(seed);
+
+	std::shuffle(arr.begin(), arr.end(), g);
+
+	return arr;
+}
+
+void Enemy::RollD20()
+{
+    DrawFrameFromFile("d20.txt", 86, 38);
+	MinLRbutton = 8;
+	MaxLRbutton = 7;
+	LRbutton = 7;
+    std::wstring str;
+    std::vector<int> values = generateShuffledArray(20);
+    int Nkey;
+    int n;
+    int i = 0;
+    int MaxI = 60;
+
+    for (auto i : values) {
+        std::cout << i << " \n";
+    }
+
+    str = LoadPhrase("mod_d20") + L" +" + std::to_wstring(player->getModD20());
+    DrawText(str, 98-str.size()/2,51);
+
+	str = L"[color=#D9C906]" + LoadPhrase("stop_d20");
+	DrawText(str, 98 - (str.size()-15) / 2,53);
+
+    while(true){
+        Nkey = terminal_peek();
+
+        BaseIfTerminal(Nkey);
+
+        n = values[i % 20];
+		if (n / 10 < 1) {
+			DrawText(L"[offset=0,5]" + std::to_wstring(n), 97, 43);
+
+			DrawText(L" ", 96, 43);
+			DrawText(L" ", 98, 43);
+		}
+		else {
+			DrawText(L"[offset=3,5]" + std::to_wstring(int(n / 10)), 96, 43);
+			DrawText(L"[offset=-3,5]" + std::to_wstring(int(n % 10)), 98, 43);
+
+			DrawText(L" ", 97, 43);
+		}
+
+		if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
+			break;
+		}
+        else if (i >= MaxI) {
+            break;
+        }
+
+		delay(200);
+		DrawFrameFromFile("d20An.txt", 86, 38, true, L"", false);
+		delay(200);
+		DrawFrameFromFile("d20.txt", 86, 38, true, L"", false);
+		i++;
+    }
 }
 
 void Enemy::UpdateEmotion(){

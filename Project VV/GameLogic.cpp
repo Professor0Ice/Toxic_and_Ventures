@@ -21,6 +21,7 @@ GameLogic::GameLogic()
     Player* Gplayer = new Player(1);
     Gplayer->setName(L"Клоун");
     Gplayer->setMaxEmotion(6);
+    Gplayer->setModD20(1);
 
     //Тут ещё будет логика меню и настроек
 

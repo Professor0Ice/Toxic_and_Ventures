@@ -1,4 +1,4 @@
-#include "Render.h"
+#include "AttackRepos.h"
 
 const fs::path FolderName = "Save";
 const char key = 62;
@@ -28,6 +28,8 @@ public:
 	int getTime();
 	int getMaxEmotion();
 	void setMaxEmotion(int max);
+	int getModD20();
+	void setModD20(int Mod);
 private:
 	std::string filename;
 	std::wstring name;
@@ -42,6 +44,7 @@ private:
 	int Phrase; // кол. фраз
 	std::chrono::time_point<std::chrono::steady_clock> creationTime;
 	int Time;
+	int ModD20;
 
 	void xor_encrypt_decrypt(char* data, size_t size, char key);
 	void serialize_data(std::ofstream& ofs);
@@ -96,6 +99,8 @@ protected:
 	void UpdateButton();
 	void LoadEmotionV();
 	void UpdateEmotionVisual();
+	void ClearAction();
+	void RollD20();
 };
 
 class Mimik : public Enemy {

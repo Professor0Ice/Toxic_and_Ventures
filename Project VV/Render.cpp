@@ -88,12 +88,14 @@ void ClearTerminal() {
     terminal_clear();
 }
 
-void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh, std::wstring replace) {
+void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh, std::wstring replace, bool memory) {
     fs::path path = fs::current_path() / "Interfaces" / filename;
-    screenFiles.push_back(filename);
-    screenFilesCoord.push_back(x);
-    screenFilesCoord.push_back(y);
-    replaceText.push_back(replace);
+	if(memory){
+		screenFiles.push_back(filename);
+		screenFilesCoord.push_back(x);
+		screenFilesCoord.push_back(y);
+		replaceText.push_back(replace);
+	}
 
     std::ifstream file(path.string());
     if (!file.is_open()) {
@@ -101,6 +103,7 @@ void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh, 
         return;
     }
 
+    terminal_layer(0);
     std::string line;
     while (std::getline(file, line)) {
         // ѕреобразуем прочитанную строку из UTF-8 в std::wstring
@@ -137,12 +140,15 @@ void SetFontSize() {
     std::cout << "\n";
 }
 
-void DrawText(std::wstring text, int x, int y) {
+void DrawText(std::wstring text, int x, int y, bool Memory) {
+	terminal_layer(1);
     terminal_print(x, y, text.c_str());
     terminal_refresh();
-    screenText.push_back(text); 
-    screenTextCoord.push_back(x);
-    screenTextCoord.push_back(y);
+	if(Memory){
+		screenText.push_back(text);
+		screenTextCoord.push_back(x);
+		screenTextCoord.push_back(y);
+	}
 }
 
 void LoadScreen() {
@@ -155,8 +161,9 @@ void LoadScreen() {
     ClearTerminal();
 
     for (int i = 0; i < screenF.size(); i++) {
-        DrawFrameFromFile(screenF[i], screenFC[i * 2], screenFC[i * 2 + 1], true, replaceT[i]);
+        DrawFrameFromFile(screenF[i], screenFC[i * 2], screenFC[i * 2 + 1], false, replaceT[i]);
     }
+    terminal_refresh();
     for (int i = 0; i < screenT.size(); i++) {
         DrawText(screenT[i], screenTC[i * 2], screenTC[i * 2 + 1]);
     }

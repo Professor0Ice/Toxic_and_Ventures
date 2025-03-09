@@ -131,12 +131,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AttackRepos.cpp" />
     <ClCompile Include="Entitys.cpp" />
     <ClCompile Include="GameLogic.cpp" />
     <ClCompile Include="Project VV.cpp" />
     <ClCompile Include="Render.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AttackRepos.h" />
     <ClInclude Include="Entitys.h" />
     <ClInclude Include="GameLogic.h" />
     <ClInclude Include="Head\BearLibTerminal.h" />

@@ -11,6 +11,11 @@
 #include <cmath>
 #include <Windows.h>
 #include <regex>
+#include <algorithm>
+#include <random>
+#include <thread>
+#include <functional>
+#include <stdexcept>
 
 namespace fs = std::filesystem;
 using json = nlohmann::json;
@@ -21,11 +26,11 @@ std::wstring LoadPhrase(const std::string& phraseName);
 
 void ClearTerminal();
 
-void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh = true, std::wstring replace = L"");
+void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh = true, std::wstring replace = L"", bool memory = true);
 
 void SetFontSize();
 
-void DrawText(std::wstring text, int x, int y);
+void DrawText(std::wstring text, int x, int y, bool Memory = true);
 
 void LoadScreen();
 

@@ -70,12 +70,13 @@ protected:
 class Enemy : public Entity {
 protected:
 	std::string TagName;
-	//PhaseName - для описания уже есть
+	//PhaseName - начального для описания уже есть
 	std::string EnemyFileName;
 	int EnemyCoord[2];
 
-	//std::vector<EnemyAttack> Attack; // - в будущем для задачи возможных атак
-	std::vector<int> NumAttack; // - для задачи количества атак
+	std::string TagSearch;
+
+	std::vector<std::pair<std::string, int >> EnemyAttackList; // tag и количество
 
 	int stress = 60; 
 	int def = 30;
@@ -90,7 +91,7 @@ protected:
 
 	//std::vector<enchant>; // - зачарование монстра
 
-	//std::vector<PlayerAttack>; // Атаки игрока с дабл уроном
+	std::vector<std::string> CritPhrase; // Атаки игрока с дабл уроном
 
 	int DifficultyD20Roll = 2;
 

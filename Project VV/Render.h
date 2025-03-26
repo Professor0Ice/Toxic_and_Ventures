@@ -24,6 +24,8 @@ std::wstring operator*(const std::wstring& str, int n);
 
 std::wstring LoadPhrase(const std::string& phraseName);
 
+int getRandomInt(int min, int max);
+
 void ClearTerminal();
 
 void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh = true, std::wstring replace = L"", bool memory = true);

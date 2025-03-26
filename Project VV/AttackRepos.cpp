@@ -32,8 +32,6 @@ AttackEffect DefaultEffectFormulaMe(struct AttackEffect Attack, std::array<int, 
 	return Attack;
 }
 
-
-
 std::vector<std::pair<std::string, std::array<int, 6>>> AttackRepository::GetAttackTagsPlayer()
 {
 	std::ifstream file("RepositoryFun.json");
@@ -58,6 +56,96 @@ std::vector<std::pair<std::string, std::array<int, 6>>> AttackRepository::GetAtt
 	}
 
 	return attacks;
+}
+
+std::string AttackRepository::GetAttackByType(std::vector<std::pair<std::string, int>>& attacks, int type)
+{	
+	std::ifstream file("RepositoryFun.json");
+	if (!file.is_open()) {
+		throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
+	}
+
+	std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	json data;
+	try {
+		data = json::parse(utf8Content);
+	}
+	catch (const json::parse_error& e) {
+		throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
+	}
+
+
+	std::vector < std::string > TypeAttacks;
+
+	for (const auto& info : attacks){
+		for (const auto& attack : data["EnemyAttack"]) {
+			if (attack["tag"].get<std::string>() == info.first) {
+				if (attack["type"].get<int>() == type and info.second > 0) {
+					TypeAttacks.push_back(info.first);
+				}
+			}
+		}
+	}
+
+	if (TypeAttacks.size() == 0) {
+		return "";
+	}
+	else if (TypeAttacks.size() == 1) {
+		for (auto& info : attacks) {
+			if (info.first == TypeAttacks[0]) {
+				info.second--;
+				return TypeAttacks[0];
+			}
+		}
+	}
+	else {
+		std::string NameAttack = TypeAttacks[getRandomInt(0, TypeAttacks.size()-1)];
+
+		for (auto& info : attacks) {
+			if (info.first == NameAttack) {
+				info.second--;
+				return NameAttack;
+			}
+		}
+	}
+}
+
+AttackDataEnemy AttackRepository::GetAttackByTagEnemy(const std::string& tag)
+{
+	std::ifstream file("RepositoryFun.json");
+	if (!file.is_open()) {
+		throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
+	}
+
+	std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	json data;
+	try {
+		data = json::parse(utf8Content);
+	}
+	catch (const json::parse_error& e) {
+		throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
+	}
+
+	AttackDataEnemy result;
+	std::array<int, 3> array;
+
+	for (const auto& attack : data["EnemyAttack"]) {
+		if (attack["tag"].get<std::string>() == tag) {
+
+			result.tag = attack["tag"].get<std::string>();
+			
+			array = attack["PlayerEffect"].get<std::array<int, 3>>();
+			result.EffectPlayer = {array[0],array[1],array[2]};
+
+			array = attack["EnemyEffect"].get<std::array<int, 3>>();
+			result.EffectEnemy = { array[0],array[1],array[2] };
+
+			return result;
+		}
+	}
+	throw std::runtime_error("Attack not found");
 }
 
 const AttackData AttackRepository::GetAttackByTagPlayer(const std::string& tag, std::array<int, 6>& Emotions)
@@ -99,11 +187,3 @@ const AttackData AttackRepository::GetAttackByTagPlayer(const std::string& tag, 
 	}
 	throw std::runtime_error("Attack not found");
 }
-
-
-static const AttackDataEnemy DefaultAttack = {
-		"pants",
-		{ 0, 0, 0 },
-		{ 15, 0, 0 },
-};
-

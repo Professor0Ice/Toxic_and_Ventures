@@ -338,12 +338,16 @@ Entity* Enemy::NextAction()
     int sum;
     bool focus = false;
     bool UpDown = true;
+    bool Bruh;
 
     std::string TagAttack;
     AttackData Attack;
     AttackEffect AttackEff;
     float Multiply = 1;
     AttackRepository Repos;
+
+    std::vector<std::wstring> phrase;
+    std::wstring line;
 
     // Интерфейс боя
 	ClearTerminal();
@@ -471,7 +475,20 @@ Entity* Enemy::NextAction()
                         ClearAction();
                         Attack = AttackRepository().GetAttackByTagPlayer(SelectPhrase(Repos), emotionPhrase);
                         ClearAction();
-                        Multiply = RollD20(DifficultyD20Roll);
+
+                        Multiply = 2;
+
+                        Bruh = false;
+                        for (auto i : CritPhrase) {
+                            if (i == Attack.tag) {
+                                Bruh = true;
+                            }
+                        }
+                        if (!Bruh) {
+                            Multiply = RollD20(DifficultyD20Roll);
+                        }
+
+                        ClearAction();
 
                         AttackEff = Attack.EffectPlayer;
                         
@@ -495,6 +512,35 @@ Entity* Enemy::NextAction()
                         for (int i = 0; i < 6;i++) {
                             DropEmotion[i] = 0;
                             emotionPhrase[i] = 0;
+                        }
+
+                        phrase = SplitString(LoadPhrase(Attack.tag + "_full"));
+                        line = L"";
+                        int k = 0;
+
+                        for (auto i : phrase) {
+                            if (line.size() + i.size() >= 104) {
+                                DrawText(line, 46, 38 + k);
+                                k++;
+                                line = i + L" ";
+                            }
+                            else {
+                                line += i + L" ";
+                            }
+                        }
+                        if (line.size() != 0) {
+                            DrawText(line, 46, 38 + k);
+                        }
+
+                        Nkey = terminal_read();
+                        while (true) {
+                            Nkey = terminal_read(); 
+
+                            BaseIfTerminal(Nkey); 
+
+                            if (Nkey == TK_ENTER or Nkey == TK_SPACE) { 
+                                break;
+                            }
                         }
                         
 						NumButton = 0;
@@ -728,18 +774,6 @@ std::vector<int> generateShuffledArray(int n) {
 	std::shuffle(arr.begin()  , arr.end(), g);
 
 	return arr;
-}
-
-int getRandomInt(int min, int max) {
-	if (min > max) std::swap(min, max);
-
-	std::random_device rd;
-	std::seed_seq seed{ rd(), static_cast<unsigned>(
-		std::chrono::high_resolution_clock::now().time_since_epoch().count()) };
-	std::mt19937 g(seed);
-
-	std::uniform_int_distribution<int> dist(min, max);
-	return dist(g);
 }
 
 void Enemy::DamagePlayer(AttackEffect damage)

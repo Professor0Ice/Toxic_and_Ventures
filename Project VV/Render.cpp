@@ -76,7 +76,21 @@ std::wstring LoadPhrase(const std::string& phraseName) {
         }
     }
     std::cout << phraseName << std::endl;
+
+ 
     throw std::runtime_error("Фраза с именем '" + phraseName + "' не найдена.");
+}
+
+int getRandomInt(int min, int max) {
+    if (min > max) std::swap(min, max);
+
+    std::random_device rd;
+    std::seed_seq seed{ rd(), static_cast<unsigned>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) };
+    std::mt19937 g(seed);
+
+    std::uniform_int_distribution<int> dist(min, max);
+    return dist(g);
 }
 
 void ClearTerminal() {

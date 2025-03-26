@@ -13,15 +13,21 @@ struct AttackData {
 	std::array<int, 6> minEmotions;
 	AttackEffect EffectPlayer;
 	AttackEffect EffectEnemy;
-	EffectFormula resultMe;
-	EffectFormula resultTarget;             // Функция для расчёта итогового эффекта с учётом лишних эмоций
 };
 
-class AttackRepositoryPlayer {
+class AttackRepository {
+
 public:
-	static const std::vector<AttackData>& GetAttacks();
+	static std::vector<std::pair<std::string, std::array<int, 6>>> GetAttackTagsPlayer();
 
-	static std::vector<std::pair<std::string, std::array<int, 6>>> GetAttackTags();
+	static const AttackData GetAttackByTagPlayer(const std::string& tag, std::array<int, 6>& Emotions);
+};
 
-	static const AttackData& GetAttackByTag(const std::string& tag);
+enum TypeAttack { damage, debaff, heal, baff, average};
+// Типы фраз 
+
+struct AttackDataEnemy {
+	std::string tag;
+	AttackEffect EffectPlayer;
+	AttackEffect EffectEnemy;
 };

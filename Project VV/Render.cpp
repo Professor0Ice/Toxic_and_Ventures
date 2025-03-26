@@ -132,7 +132,7 @@ void SetFontSize() {
 	int cellHeight = screenHeight / cellCountY;
 
 	// Пробуем подобрать максимально возможный размер шрифта (примерно)
-	int fontSize = min(cellHeight, cellWidth*1.5); // Коэффициент 2 — потому что шрифт обычно выше, чем шире
+	int fontSize = min(cellHeight, static_cast<int>(cellWidth*1.5)); // Коэффициент 2 — потому что шрифт обычно выше, чем шире
 
 	// Собираем команду
 	std::string fontCmd = "font: fonts/UbuntuMono-Regular.ttf, size=" + std::to_string(fontSize);
@@ -148,10 +148,10 @@ void SetFontSize() {
 	std::cout << "[DEBUG] " << cellSizeCmd << "\n";
 }
 
-void DrawText(std::wstring text, int x, int y, bool Memory) {
+void DrawText(std::wstring text, int x, int y, bool Memory, bool refresh) {
 	terminal_layer(1);
     terminal_print(x, y, text.c_str());
-    terminal_refresh();
+    if(refresh){terminal_refresh();}
 	if(Memory){
 		screenText.push_back(text);
 		screenTextCoord.push_back(x);
@@ -171,10 +171,10 @@ void LoadScreen() {
     for (int i = 0; i < screenF.size(); i++) {
         DrawFrameFromFile(screenF[i], screenFC[i * 2], screenFC[i * 2 + 1], false, replaceT[i]);
     }
-    terminal_refresh();
     for (int i = 0; i < screenT.size(); i++) {
-        DrawText(screenT[i], screenTC[i * 2], screenTC[i * 2 + 1]);
+        DrawText(screenT[i], screenTC[i * 2], screenTC[i * 2 + 1], true,false);
     }
+    terminal_refresh();
 }
 
 std::vector<std::wstring> SplitString(const std::wstring& input) {

@@ -30,7 +30,7 @@ void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh =
 
 void SetFontSize();
 
-void DrawText(std::wstring text, int x, int y, bool Memory = true);
+void DrawText(std::wstring text, int x, int y, bool Memory = true, bool refresh = true);
 
 void LoadScreen();
 

@@ -30,6 +30,10 @@ public:
 	void setMaxEmotion(int max);
 	int getModD20();
 	void setModD20(int Mod);
+
+	bool DevideEmotion(int Emotion);
+	bool ItsEcho(int Emotion);
+	void AddEchoEmotion(int Emotion, int num = 1);
 private:
 	std::string filename;
 	std::wstring name;
@@ -45,6 +49,8 @@ private:
 	std::chrono::time_point<std::chrono::steady_clock> creationTime;
 	int Time;
 	int ModD20;
+
+	bool echo = false; //Чтобы узнать была потраченна ли эхо эмоция
 
 	void xor_encrypt_decrypt(char* data, size_t size, char key);
 	void serialize_data(std::ofstream& ofs);
@@ -86,6 +92,10 @@ protected:
 
 	//std::vector<PlayerAttack>; // Атаки игрока с дабл уроном
 
+	int DifficultyD20Roll = 2;
+
+	float DifficultyEscape = 1.0f;
+
 	Entity* NextAction() override;
 	void UpdateStress();
 	void UpdateStressEm();
@@ -100,7 +110,12 @@ protected:
 	void LoadEmotionV();
 	void UpdateEmotionVisual();
 	void ClearAction();
-	void RollD20();
+
+	void DamagePlayer(AttackEffect damage);
+	void DamageEnemy(AttackEffect damage);
+	float RollD20(int difficulty);
+	std::string SelectPhrase(AttackRepository& Repos);
+	void SelectPhraseText(std::vector<std::string>& phrase, int select);
 };
 
 class Mimik : public Enemy {

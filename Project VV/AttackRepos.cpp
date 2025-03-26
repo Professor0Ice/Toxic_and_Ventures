@@ -34,141 +34,76 @@ AttackEffect DefaultEffectFormulaMe(struct AttackEffect Attack, std::array<int, 
 
 
 
-
-const std::vector<AttackData>& AttackRepositoryPlayer::GetAttacks()
+std::vector<std::pair<std::string, std::array<int, 6>>> AttackRepository::GetAttackTagsPlayer()
 {
-	static const std::vector<AttackData> attacks = {
-			{
-				"primer", // Это тег ключевой фразы - при добавлении "_full" - будет тег самой фразы
-				{ 2, 0, 0, 0, 0, 0 }, // Это мин. количество эмоций
-				{ 10, -5, 0 }, // Это эффект на игрока - стресс, защита уклонение
-				{ 20, -4, -2 }, // Это эффект на противника - стресс, защита уклонение
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget // сюда имя формулы через которую будут проходить параметры
-			},
-			{
-				"pants",
-				{ 1, 0, 0, 0, 0, 0 }, // 1 страх
-				{ 5, 0, 10 },
-				{ 15, 0, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"punch",
-				{ 0, 1, 0, 0, 0, 0 }, // 1 злость
-				{ 0, -10, -5 },
-				{ 25, 0, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"delete",
-				{ 0, 1, 0, 0, 0, 0 }, // 1 злость
-				{ 0, -10, -10},
-				{ 25, -5, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"myphic",
-				{ 0, 0, 1, 0, 0, 0 }, // 1 презрение
-				{ 0, 0, 0},
-				{ 10, -20, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"smile",
-				{ 0, 0, 0, 0, 1, 0 }, // 1 умротворенность
-				{ -15, 0, 10},
-				{ 0, 0, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"carryon",
-				{ 0, 0, 0, 1, 0, 0 }, // 1 радость
-				{ -15, 10, 0},
-				{ 0, 0, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"NPC",
-				{ 0, 0, 0, 0, 0, 1 }, // 1 вдохновение
-				{ -15, 0, 0},
-				{ 10, 0, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"norespect",
-				{ 1, 0, 1, 0, 0, 0}, // 1 страх 1 през
-				{ 0, 0, 5},
-				{ 15, -15, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"mountains",
-				{ 0, 1, 0, 0, 0, 1}, // 1 злось 1 вдох
-				{ -5, -10, 0},
-				{ 30, 0, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"miserable",
-				{ 0, 0, 1, 0, 0, 1}, // 1 през 1 вдох
-				{ -5, 5, 0},
-				{ 20, -10, 0 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"nature",
-				{ 1, 0, 1, 0, 0, 0}, // 1 през 1 злость
-				{ 5, -5, 0},
-				{ 10, -10, -10 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"truth",
-				{ 0, 0, 1, 0, 2, 0}, // 2 умир 1 през
-				{ 0, 10, 15},
-				{ 0, -5, -15 },
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
-			{
-				"science",
-				{ 2, 0, 0, 0, 0, 1}, // 2 страх 1 вдох
-				{ -10, 10, 5},
-				{ 5, -15, 0},
-				DefaultEffectFormulaMe,
-				DefaultEffectFormulaTarget
-			},
+	std::ifstream file("RepositoryFun.json");
+	if (!file.is_open()) {
+		throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
+	}
 
-	};
+	std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	json data;
+	try {
+		data = json::parse(utf8Content);
+	}
+	catch (const json::parse_error& e) {
+		throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
+	}
+
+	std::vector<std::pair<std::string, std::array<int, 6>>> attacks;
+
+	for (const auto& attack : data["PlayerAttack"]) {
+		attacks.push_back({ attack["tag"].get<std::string>(), attack["minEmotion"].get<std::array<int, 6>>() });
+	}
+
 	return attacks;
 }
 
-std::vector<std::pair<std::string, std::array<int, 6>>> AttackRepositoryPlayer::GetAttackTags()
+const AttackData AttackRepository::GetAttackByTagPlayer(const std::string& tag, std::array<int, 6>& Emotions)
 {
-	std::vector<std::pair<std::string, std::array<int, 6>>> tags;
-	for (const auto& attack : GetAttacks()) {
-		tags.push_back({ attack.tag, attack.minEmotions });
+	std::ifstream file("RepositoryFun.json");
+	if (!file.is_open()) {
+		throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
 	}
-	return tags;
-}
 
-const AttackData& AttackRepositoryPlayer::GetAttackByTag(const std::string& tag)
-{
-	for (const auto& attack : GetAttacks()) {
-		if (attack.tag == tag)
-			return attack;
+	std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	json data;
+	try {
+		data = json::parse(utf8Content);
+	}
+	catch (const json::parse_error& e) {
+		throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
+	}
+
+	std::vector<std::pair<std::string, std::array<int, 6>>> attacks;
+
+	AttackData result;
+	std::array<int, 3> array;
+
+	for (const auto& attack : data["PlayerAttack"]) {
+		if (attack["tag"].get<std::string>() == tag) {
+
+			result.tag = attack["tag"].get<std::string>();
+			result.minEmotions = attack["minEmotion"].get<std::array<int, 6>>();
+
+			array = attack["PlayerEffect"].get<std::array<int, 3>>();
+			result.EffectPlayer = DefaultEffectFormulaMe({array[0],array[1],array[2]},result.minEmotions, Emotions);
+
+			array = attack["EnemyEffect"].get<std::array<int, 3>>();
+			result.EffectEnemy = DefaultEffectFormulaTarget({ array[0],array[1],array[2] }, result.minEmotions, Emotions);
+
+			return result;
+		}
 	}
 	throw std::runtime_error("Attack not found");
 }
+
+
+static const AttackDataEnemy DefaultAttack = {
+		"pants",
+		{ 0, 0, 0 },
+		{ 15, 0, 0 },
+};
+

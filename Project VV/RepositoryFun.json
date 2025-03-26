@@ -1,0 +1,47 @@
+{
+  "PlayerAttack": [
+    {
+      "tag": "pants",
+      "minEmotion": [1,0,0,0,0,0],
+	  "PlayerEffect": [5,0,10],
+	  "EnemyEffect": [15,0,0]
+    },
+	{
+      "tag": "punch",
+      "minEmotion": [0,1,0,0,0,0],
+	  "PlayerEffect": [0,-10,-5],
+	  "EnemyEffect": [25,0,0]
+    },
+	{
+      "tag": "myphic",
+      "minEmotion": [0,0,1,0,0,0],
+	  "PlayerEffect": [0,0,5],
+	  "EnemyEffect": [10,-20,0]
+    },
+	{
+      "tag": "carryon",
+      "minEmotion": [0,0,0,1,0,0],
+	  "PlayerEffect": [-15,10,0],
+	  "EnemyEffect": [0,0,0]
+    },
+	{
+      "tag": "smile",
+      "minEmotion": [0,0,0,0,1,0],
+	  "PlayerEffect": [-15,0,10],
+	  "EnemyEffect": [0,0,0]
+    },
+	{
+      "tag": "NPC",
+      "minEmotion": [0,0,0,0,0,1],
+	  "PlayerEffect": [-15,0,0],
+	  "EnemyEffect": [10,0,0]
+    }
+  ],
+  "EnemyAttack": [
+    {
+      "tag": "primer",
+	  "PlayerEffect": [0,0,0],
+	  "EnemyEffect": [0,0,0]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 ﻿#include "Entitys.h"
 
-int emotionPhrase[6] = { 0,0,0,0,0,0 };
+std::array<int, 6> emotionPhrase = { 0,0,0,0,0,0 };
+std::array<int, 6> DropEmotion = { 0,0,0,0,0,0 }; 
 std::wstring dodgeColor[5] = {
 	L"#aa1803",
 	L"#bd613c",
@@ -196,6 +197,34 @@ void Player::setModD20(int Mod)
     ModD20 = Mod;
 }
 
+bool Player::DevideEmotion(int Emotion)
+{
+    if (echo_emotions[Emotion] > 0) {
+        echo_emotions[Emotion]--;
+        return true;
+    }
+    if (emotions[Emotion] > 0) {
+        emotions[Emotion]--;
+        echo = true;
+        return true;
+    }
+    return false;
+}
+
+bool Player::ItsEcho(int Emotion)
+{   
+    if (echo) {
+        echo = !echo;
+        return true;
+    }
+    return false;
+}
+
+void Player::AddEchoEmotion(int Emotion, int num)
+{
+    echo_emotions[Emotion] += num;
+}
+
 void Player::xor_encrypt_decrypt(char* data, size_t size, char key)
 {
     for (size_t i = 0; i < size; ++i) {
@@ -280,7 +309,7 @@ Entity* Entity::start(Player* playerN)
     }
 
     line = LoadPhrase("next");
-    DrawText(line, 95 - line.size() / 2, 50);
+    DrawText(line, 95 - static_cast<int>(line.size() / 2), 50);
 
     while (true) {
 
@@ -309,6 +338,12 @@ Entity* Enemy::NextAction()
     int sum;
     bool focus = false;
     bool UpDown = true;
+
+    std::string TagAttack;
+    AttackData Attack;
+    AttackEffect AttackEff;
+    float Multiply = 1;
+    AttackRepository Repos;
 
     // Интерфейс боя
 	ClearTerminal();
@@ -383,11 +418,29 @@ Entity* Enemy::NextAction()
 				switch (NumButton) {
 				case 1:
                     focus = true;
-                    MinLRbutton = 1;
-                    MaxLRbutton = 7;
+					MinLRbutton = 1;
+					MaxLRbutton = 7;
 					LRbutton = 4;
 					LoadEmotionV();
 					break;
+				case 4:
+					UpDown = false;
+					Multiply = RollD20(20);
+
+					if (Multiply >= DifficultyEscape) {
+						return new Entity;
+					}
+					else {
+						NumButton = 0;
+						LRbutton = 0;
+						UpdateStress();
+						UpdateStressEm();
+						UpdateEmotion();
+						LoadEnemyInfo();
+						UpdateButton();
+						ClearAction();
+						UpDown = true;
+					}
 				default:
 					break;
 				}
@@ -402,18 +455,59 @@ Entity* Enemy::NextAction()
 
                     if (LRbutton < 6) {
 						if (sum < player->getMaxEmotion()) {
-							emotionPhrase[LRbutton] += 1;
-							LoadEmotionV();
+                            if (player->DevideEmotion(LRbutton)) {
+								emotionPhrase[LRbutton] += 1;
+								if (player->ItsEcho(LRbutton)) {
+                                    DropEmotion[LRbutton]++;
+								}
+                                UpdateEmotion();
+								LoadEmotionV();
+                            }
 						}
 					}
 
                     else  if(LRbutton == 6 and sum > 0){
                         UpDown = false;
                         ClearAction();
-                        RollD20();
-                    }
+                        Attack = AttackRepository().GetAttackByTagPlayer(SelectPhrase(Repos), emotionPhrase);
+                        ClearAction();
+                        Multiply = RollD20(DifficultyD20Roll);
 
-					break;
+                        AttackEff = Attack.EffectPlayer;
+                        
+                        AttackEff.Defense = static_cast<int>(AttackEff.Defense * Multiply);
+                        AttackEff.Dodge = static_cast<int>(AttackEff.Dodge * Multiply);
+                        AttackEff.Stress = static_cast<int>(AttackEff.Stress * Multiply);
+
+                        DamagePlayer(AttackEff);
+
+                        AttackEff = Attack.EffectEnemy;
+
+						AttackEff.Defense = static_cast<int>(AttackEff.Defense * Multiply);
+						AttackEff.Dodge = static_cast<int>(AttackEff.Dodge * Multiply);
+						AttackEff.Stress = static_cast<int>(AttackEff.Stress * Multiply);
+
+						DamageEnemy(AttackEff);
+
+                        for (int i = 0; i < 6; i++) {
+                            player->AddEchoEmotion(i,DropEmotion[i]);
+                        }
+                        for (int i = 0; i < 6;i++) {
+                            DropEmotion[i] = 0;
+                            emotionPhrase[i] = 0;
+                        }
+                        
+						NumButton = 0;
+						LRbutton = 0;
+						UpdateStress();
+						UpdateStressEm();
+						UpdateEmotion();
+						LoadEnemyInfo();
+						UpdateButton();
+                        ClearAction();
+                        UpDown = true;
+                    }
+                    break;
 				default:
 					break;
 				}
@@ -423,6 +517,8 @@ Entity* Enemy::NextAction()
         if (Nkey == TK_BACKSPACE or Nkey == TK_DELETE) {
             if (focus and NumButton == 1 and emotionPhrase[LRbutton] != 0 and LRbutton!=7) {
 				emotionPhrase[LRbutton] -= 1;
+                player->AddEchoEmotion(LRbutton);
+                UpdateEmotion();
 				LoadEmotionV();
             }
         }
@@ -452,14 +548,14 @@ void Enemy::UpdateStress()
 void Enemy::LoadName()
 {
     std::wstring str = LoadPhrase("name_h") + L" - [color=green]" + player->getName();
-    DrawText(str, 139 + 52/2 - (str.size()-13)/2 - 4, 5);
+    DrawText(str, 139 + static_cast<int>(52/2) - static_cast<int>((str.size()-13)/2) - 4, 5);
     LoadHP();
 }
 
 void Enemy::LoadHP()
 {
 	std::wstring str = LoadPhrase("hp") + L": " + std::to_wstring(player->getHP());
-	DrawText(str, 139 + 52 / 2 - (str.size()) / 2 - 4, 6);
+	DrawText(str, 139 + static_cast<int>(52 / 2 - (str.size()) / 2) - 4, 6);
 }
 
 void Enemy::LoadArtefacts()
@@ -467,15 +563,15 @@ void Enemy::LoadArtefacts()
     std::wstring str;
 
     str = LoadPhrase("artefacts");
-    DrawText(str, 170 + 18 / 2 - (str.size() +1 ) / 2, 9);
+    DrawText(str, 170 + static_cast<int>(18 / 2 - (str.size() +1 ) / 2), 9);
 
     for (auto i : player->getArtefacts()) {
         //потом реализую - пока нет класса артефактов
         str = L"Хи-хи-ха";
-        DrawText(str, 170 + 18 / 2 - (str.size()) / 2, 11);
+        DrawText(str, 170 + static_cast<int>(18 / 2 - (str.size()) / 2), 11);
     }
     str = L"Хи-хи-ха";
-    DrawText(str, 170 + 18 / 2 - (str.size()) / 2 , 11);
+    DrawText(str, 170 + static_cast<int>(18 / 2 - (str.size()) / 2) , 11);
 }
 
 void Enemy::LoadBonus()
@@ -486,21 +582,29 @@ void Enemy::LoadBonus()
 void Enemy::LoadEnemyInfo()
 {
     std::wstring str;
+    std::wstring space = L" ";
+
+    str = space*36;
+    for (int i = 0; i < 16; i++) {
+        DrawText(str, 3, 37 + i, true, false);
+    }
+
     str = LoadPhrase(TagName);
-    DrawText(str, 3 + 38/2 - (str.size() - 15 )/2 -2, 38);
+    DrawText(str, 3 + static_cast<int>(38/2 - (str.size() - 15 )/2) -2, 38,true,false);
 
     str = LoadPhrase("En_stress") + L": " + LoadPhrase("En_stress" + std::to_string(int(stress/20+1)));
-    DrawText(str, 3 + 38 / 2 - (str.size()) / 2 - 2, 40);
+    DrawText(str, 3 + static_cast<int>(38 / 2 - (str.size()) / 2) - 2, 40, true, false);
 
 	str = LoadPhrase("En_def") + L": " + LoadPhrase("En_def" + std::to_string(int(def / 20 +1)));
-	DrawText(str, 3 + 38 / 2 - (str.size()) / 2 - 2, 41);
+	DrawText(str, 3 + static_cast<int>(38 / 2 - (str.size()) / 2) - 2, 41, true, false);
 
 	str = LoadPhrase("En_dod") + L": " + LoadPhrase("En_dod" + std::to_string(int(dodge / 20 +1)));
-	DrawText(str, 3 + 38 / 2 - (str.size()) / 2 - 2, 42);
+	DrawText(str, 3 + static_cast<int>(38 / 2 - (str.size()) / 2) - 2, 42, true, false);
 
 	str = LoadPhrase("En_bonus") + L":";
-	DrawText(str, 3 + 38 / 2 - (str.size()) / 2 - 2, 44);
+	DrawText(str, 3 + static_cast<int>(38 / 2 - (str.size()) / 2) - 2, 44, true, false);
 
+    terminal_refresh();
 }
 
 void Enemy::LoadButton()
@@ -510,7 +614,7 @@ void Enemy::LoadButton()
         str = LoadPhrase("button_battle" + std::to_string(i+1));
 
         DrawFrameFromFile("button_battle.txt",157,36+i*5, false);
-        DrawText(str, 163 + 24 / 2 - (str.size()) / 2, 38+i*5);
+        DrawText(str, 163 + static_cast<int>(24 / 2 - (str.size()) / 2), 38+i*5);
     }
     DrawFrameFromFile("button_battle_ext.txt", 157, 51);
 }
@@ -528,7 +632,7 @@ void Enemy::UpdateButton()
 		if(NumButton<4){
             DrawFrameFromFile("button_battle_act.txt", 157, 36 + (NumButton - 1) * 5, false);
 			str = LoadPhrase("button_battle" + std::to_string(NumButton));
-			DrawText(str, 163 + 24 / 2 - (str.size()) / 2, 38 + (NumButton-1) * 5);
+			DrawText(str, 163 + static_cast<int>(24 / 2 - (str.size()) / 2), 38 + (NumButton-1) * 5);
 		}
         else {
             DrawFrameFromFile("button_battle_ext_act.txt", 157, 36 + (NumButton - 1) * 5, false);
@@ -549,11 +653,11 @@ void Enemy::LoadEmotionV()
 
 	int totalWordsLength = 0;
 	for (const auto& word : phrases) {
-		totalWordsLength += word.size();
+		totalWordsLength += static_cast<int>(word.size());
 	}
 
 	int availableSpace = 98 - totalWordsLength;
-	int numGaps = phrases.size() - 1;
+	int numGaps = static_cast<int>(phrases.size()) - 1;
 	int gapSize = (numGaps > 0 && availableSpace > 0) ? (availableSpace / numGaps) : 0;
 
 	int posX = 49;
@@ -563,7 +667,7 @@ void Enemy::LoadEmotionV()
 		DrawText(phrases[i], posX, 50);
         DrawText(plus*emotionPhrase[i]+L" ", posX, 51);
 
-        posX += phrases[i].size() + gapSize -15*(LRbutton == i);
+        posX += static_cast<int>(phrases[i].size()) + gapSize -15*(LRbutton == i);
 	}
     DrawText(phrases[6], posX, 50);
 
@@ -621,17 +725,80 @@ std::vector<int> generateShuffledArray(int n) {
 	std::seed_seq seed{ rd(), static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) };
 	std::mt19937 g(seed);
 
-	std::shuffle(arr.begin(), arr.end(), g);
+	std::shuffle(arr.begin()  , arr.end(), g);
 
 	return arr;
 }
 
-void Enemy::RollD20()
+int getRandomInt(int min, int max) {
+	if (min > max) std::swap(min, max);
+
+	std::random_device rd;
+	std::seed_seq seed{ rd(), static_cast<unsigned>(
+		std::chrono::high_resolution_clock::now().time_since_epoch().count()) };
+	std::mt19937 g(seed);
+
+	std::uniform_int_distribution<int> dist(min, max);
+	return dist(g);
+}
+
+void Enemy::DamagePlayer(AttackEffect damage)
+{
+    DefendPlayer += damage.Defense;
+    DodgePlayer += damage.Dodge;
+    std::cout << "\n [Игрок] ";
+    std::cout << "\n Защита игрока увеличина на " << damage.Defense;
+    std::cout << "\n уклонение игрока игрока увеличино на " << damage.Dodge;
+
+    if(DodgePlayer < getRandomInt(1,100) + 20){
+        if (damage.Stress > 0 and DefendPlayer > 0) {
+            DefendPlayer -= damage.Stress;
+            std::cout << "\n щит игрока уменьшен на " << damage.Stress;
+            if (DefendPlayer < 0) {
+                damage.Stress = DefendPlayer * (-1);
+                DefendPlayer = 0;
+                stressPlayer += damage.Stress;
+                std::cout << "\n игроку нанесли стресса " << damage.Stress;
+            }
+        }
+        else {
+            stressPlayer += damage.Stress;
+            std::cout << "\n игроку нанесли стресса " << damage.Stress;
+        }
+    }
+    std::cout << "\n";
+}
+
+void Enemy::DamageEnemy(AttackEffect damage)
+{
+	def += damage.Defense;
+	dodge += damage.Dodge;
+    std::cout << "\n [Монстр] ";
+	std::cout << "\n Защита монстра увеличина на " << damage.Defense;
+	std::cout << "\n уклонение монстра увеличино на " << damage.Dodge;
+
+	if (dodge < getRandomInt(1, 100) + 50) {
+		if (damage.Stress > 0 and def > 0) {
+			def -= damage.Stress;
+            std::cout << "\n щит монстра уменьшен на " << damage.Stress;
+			if (def < 0) {
+				damage.Stress = def * (-1);
+				def = 0;
+                stress += damage.Stress;
+                std::cout << "\n монстру нанесли стресса " << damage.Stress;
+			}
+		}
+		else {
+			stress += damage.Stress;
+            std::cout << "\n монстру нанесли стресса " << damage.Stress;
+		}
+	}
+    std::cout << "\n";
+}
+
+float Enemy::RollD20(int difficulty)
 {
     DrawFrameFromFile("d20.txt", 86, 38);
-	MinLRbutton = 8;
-	MaxLRbutton = 7;
-	LRbutton = 7;
     std::wstring str;
     std::vector<int> values = generateShuffledArray(20);
     int Nkey;
@@ -639,15 +806,11 @@ void Enemy::RollD20()
     int i = 0;
     int MaxI = 60;
 
-    for (auto i : values) {
-        std::cout << i << " \n";
-    }
-
     str = LoadPhrase("mod_d20") + L" +" + std::to_wstring(player->getModD20());
-    DrawText(str, 98-str.size()/2,51);
+    DrawText(str, 98- static_cast<int>(str.size()/2),51);
 
 	str = L"[color=#D9C906]" + LoadPhrase("stop_d20");
-	DrawText(str, 98 - (str.size()-15) / 2,53);
+	DrawText(str, 98 - static_cast<int>((str.size()-15) / 2),53);
 
     while(true){
         Nkey = terminal_peek();
@@ -669,17 +832,152 @@ void Enemy::RollD20()
 		}
 
 		if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
-			break;
+            delay(500);
+            if (n == 20) {
+                return 2.0f;
+            }
+            if (n > 14) {
+                return 1.3f;
+            }
+			if (n > 9) {
+				return 1.1f;
+			}
+			if (n > 4) {
+				return 1.0f;
+			}
+			if (n > 1) {
+				return 0.7f;
+			}
+            else {
+                return -0.2f;
+            }
 		}
         else if (i >= MaxI) {
-            break;
+            delay(500);
+			if (n == 20) {
+				return 2.0f;
+			}
+			if (n > 14) {
+				return 1.3f;
+			}
+			if (n > 9) {
+				return 1.1f;
+			}
+			if (n > 4) {
+				return 1.0f;
+			}
+			if (n > 1) {
+				return 0.7f;
+			}
+			else {
+				return -0.2f;
+			}
         }
 
-		delay(200);
+		delay(280);
 		DrawFrameFromFile("d20An.txt", 86, 38, true, L"", false);
-		delay(200);
+		delay(150);
 		DrawFrameFromFile("d20.txt", 86, 38, true, L"", false);
 		i++;
+    }
+}
+
+std::string Enemy::SelectPhrase(AttackRepository& Repos)
+{
+	std::vector<std::pair<std::string, std::array<int, 6>>> attack = Repos.GetAttackTagsPlayer();
+    std::vector<std::pair<std::string,int>> pullFull;
+    std::vector<std::string> pullMaxPhrase;
+    std::vector<std::string> pull;
+    bool correct;
+    int MaxPh = 0;
+    int Nkey;
+
+    std::string tagDestoy;
+
+	for (auto i : attack) {
+        correct = true;
+        for (int j = 0; j < 6; j++) {
+            if (emotionPhrase[j] < i.second[j]) {
+                correct = false;
+            }
+        }
+        if (correct) {
+            pullFull.push_back({ i.first, std::accumulate(std::begin(i.second),std::end(i.second), 0) });
+            MaxPh = max(MaxPh, std::accumulate(std::begin(i.second), std::end(i.second), 0));
+        }
+	}
+
+    for (auto i : pullFull) {
+        if (i.second == MaxPh) {
+            pullMaxPhrase.push_back(i.first);
+        }
+    }
+    tagDestoy = pullMaxPhrase[getRandomInt(0, static_cast<int>(pullMaxPhrase.size()) - 1)];
+    pull.push_back(tagDestoy);
+    for (int i = 0; i < pullFull.size(); i++) {
+        if (tagDestoy == pullFull[i].first) {
+            pullFull.erase(pullFull.begin() + i);
+            break;
+        }
+    }
+    for (int i = 0; i < 2; i++) {
+		if(pullFull.size()>0){
+			tagDestoy = pullFull[getRandomInt(0, static_cast<int>(pullFull.size()) - 1)].first;
+			pull.push_back(tagDestoy);
+			for (int j = 0; j < pullFull.size(); j++) {
+				if (tagDestoy == pullFull[j].first) {
+					pullFull.erase(pullFull.begin() + j);
+					break;
+				}
+			}
+		}
+    }
+
+    while (pull.size() < 3) {
+        pull.push_back(pull[0]);
+    }
+
+    DrawFrameFromFile("select_phrase.txt",85,38);
+	MinLRbutton = 7;
+	MaxLRbutton = 9;
+	LRbutton = 7;
+    SelectPhraseText(pull, LRbutton-7);
+
+    while (true) {
+        Nkey = terminal_read();
+        BaseIfTerminal(Nkey);
+
+        if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
+            return pull[LRbutton - 7];
+        }
+
+		if (Nkey == TK_LEFT) {
+            if (LRbutton > MinLRbutton) {
+				LRbutton--;
+                SelectPhraseText(pull, LRbutton - 7);
+			}
+		}
+		if (Nkey == TK_RIGHT) {
+			if (LRbutton < MaxLRbutton) {
+				LRbutton++;
+                SelectPhraseText(pull, LRbutton - 7);
+			}
+		}
+    }
+}
+
+void Enemy::SelectPhraseText(std::vector<std::string>& phrase, int select)
+{
+    std::wstring str;
+    for (int i = 0; i < 3; i++) {
+        str = LoadPhrase(phrase[i]);
+        if (i == select) {
+            str = L"[color=#D9C906]" + str;
+            DrawText(str, 66 + i * 30 - static_cast<int>((str.size()-15) / 2), 49 + 2 * (i == 1));
+        }
+        else {
+            DrawText(str, 66 + i * 30 - static_cast<int>(str.size() / 2), 49 + 2 * (i == 1));
+        }
     }
 }
 
@@ -689,14 +987,12 @@ void Enemy::UpdateEmotion(){
     std::wstring str;
 
     player->getEmotions(emotions, echo_emotions);
-    std::cout << emotions[0];
 
     str = LoadPhrase("emotionSum") + L": " + std::to_wstring(emotions[0] + emotions[1] + emotions[2] + emotions[3] + emotions[4] + emotions[5] +
         echo_emotions[0] + echo_emotions[1] + echo_emotions[2] + echo_emotions[3] + echo_emotions[4] + echo_emotions[5]);
 	DrawText(str, 142, 9);
 
     for (int i = 0; i < 6 ; i++) {
-        std::cout << "emotion" + std::to_string(i);
         str = LoadPhrase("emotion" + std::to_string(i)) + L": " + std::to_wstring(emotions[i]) + L"  [color=gray]+" + std::to_wstring(echo_emotions[i]);
         DrawText(str, 142, 11 + i + int(i>=3) );
     }
@@ -706,7 +1002,7 @@ void Enemy::UpdateStressEm()
 {
     if (stressPlayer > -1 and stressPlayer < 99) {
 		std::wstring str = LoadPhrase("stress" + std::to_string(int(stressPlayer / 10)));
-		DrawText(str, 133 - (str.size() / 2) - 1 + 38 / 2, 34);
+		DrawText(str, 133 - static_cast<int>(str.size() / 2) - 1 + static_cast<int>(38 / 2), 34);
 	}
 }
 

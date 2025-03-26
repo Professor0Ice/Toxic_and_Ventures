@@ -22,11 +22,12 @@ GameLogic::GameLogic()
     Gplayer->setName(L"Клоун");
     Gplayer->setMaxEmotion(6);
     Gplayer->setModD20(1);
+    int emot[6] = { 10,2,2,2,2,2 };
+    Gplayer->setEmotions(emot, emot);
 
     //Тут ещё будет логика меню и настроек
 
 	while (currentEntity) {
-        terminal_delay(10);
         nextEntity = currentEntity->start(Gplayer);
         delete currentEntity;
         currentEntity = nextEntity;

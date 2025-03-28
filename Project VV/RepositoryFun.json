@@ -156,12 +156,6 @@
       "minEmotion": [ 0, 0, 0, 0, 0, 0 ],
       "PlayerEffect": [ -5, 0, 5 ],
       "EnemyEffect": [ 0, 0, 0 ]
-    },
-    {
-      "tag": "NPC",
-      "minEmotion": [ 0, 0, 0, 0, 0, 1 ],
-      "PlayerEffect": [ -15, 0, 0 ],
-      "EnemyEffect": [ 10, 0, 0 ]
     }
   ],
   "EnemyAttack": [

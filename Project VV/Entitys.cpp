@@ -345,6 +345,18 @@ Entity* Enemy::NextAction()
     float Multiply = 1;
     AttackRepository Repos;
 
+    int emotions[6];
+    int echo_emotions[6];
+    player->getEmotions(emotions, echo_emotions);
+
+    int SumPsycho = emotions[0] + emotions[1] + emotions[2] - 2*(emotions[3] + emotions[4] + emotions[5]);
+
+    std::vector<std::wstring> phrase;
+    std::wstring line;
+    int k;
+
+    stressPlayer = 20 + 5 * (SumPsycho > 0) * ((SumPsycho) - (SumPsycho > 6) * (SumPsycho - 6));
+
     // Интерфейс боя
 	ClearTerminal();
 	DrawFrameFromFile("fight interface.txt", 0, 0);
@@ -423,12 +435,37 @@ Entity* Enemy::NextAction()
 					LRbutton = 4;
 					LoadEmotionV();
 					break;
+                case 3:
+                    phrase = SplitString(L"[color=green](" + player->getName() + L")[/color] " + LoadPhrase(TagName + "_desp"));
+                    line = L"";
+                    k = 0;
+
+                    ClearAction();
+                    for (auto i : phrase) {
+                        if (line.size() + i.size() >= 104) {
+                            DrawText(line, 46 + 1 * (k != 0), 38 + k);
+                            k++;
+                            line = i + L" ";
+                        }
+                        else {
+                            line += i + L" ";
+                        }
+                    }
+                    if (line.size() != 0) {
+                        DrawText(line, 46 + 1 * (k != 0), 38 + k);
+                        k++;
+                    }
+
+                    terminal_read();
+
+                    ClearAction();
+                    break;
 				case 4:
 					UpDown = false;
 					Multiply = RollD20(20);
 
 					if (Multiply >= DifficultyEscape) {
-						return new Entity;
+						return new Mimik;
 					}
 					else {
 						NumButton = 0;
@@ -489,10 +526,10 @@ Entity* Enemy::NextAction()
                         ResultStep(Repos, TagAttack, Multiply);
 
                         if (stress >= 100) {
-                            return new Entity;
+                            return new Mimik;
                         }
                         if (stressPlayer >= 100) {
-                            return new Entity;
+                            return new Mimik;
                         }
                         
 						NumButton = 0;
@@ -749,6 +786,9 @@ void Enemy::DamagePlayer(AttackEffect damage)
             stressPlayer += damage.Stress;
             std::cout << "\n игроку нанесли стресса " << damage.Stress;
         }
+        if (DefendPlayer < 0) DefendPlayer = 0;
+        if (DodgePlayer < 0) DodgePlayer = 0;
+        if (stressPlayer < 0) stressPlayer = 0;
     }
     std::cout << "\n";
 }
@@ -776,6 +816,9 @@ void Enemy::DamageEnemy(AttackEffect damage)
 			stress += damage.Stress;
             std::cout << "\n монстру нанесли стресса " << damage.Stress;
 		}
+        if (def < 0) def = 0;
+        if (dodge < 0) dodge = 0;
+        if (stress < 0) stress = 0;
 	}
     std::cout << "\n";
 }
@@ -1368,7 +1411,15 @@ Mimik::Mimik()
 	EnemyFileName = "mimik.txt";
 	EnemyCoord[0] = 1;
 	EnemyCoord[1] = 0;
-    stress = 60;
-    dodge = 30;
+    stress = getRandomInt(30,50);
+    dodge = getRandomInt(0, 10);
     def = 0;
+
+    PsychicType = active;
+    ChanceMadness = 2;
+
+    DifficultyD20Roll = 2;
+    DifficultyEscape = 1.0f;
+
+    phraseName = TagName + "_welcome";
 }

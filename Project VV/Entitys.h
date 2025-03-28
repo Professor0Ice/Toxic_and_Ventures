@@ -77,17 +77,17 @@ protected:
 	std::string TagSearch;
 
 	std::vector<std::pair<std::string, int >> EnemyAttackList; // tag и количество
-	int PsychicType = active;
-	int ChanceMadness = 2;
+	int PsychicType;
+	int ChanceMadness;
 	// Шанс, отклонения от образа атак по d20
 
-	int stress = 60; 
-	int def = 30;
-	int dodge = 72;
+	int stress; 
+	int def;
+	int dodge;
 
-	int stressPlayer = 60;
-	int DefendPlayer = 30;
-	int DodgePlayer = 72;
+	int stressPlayer = 0;
+	int DefendPlayer = 0;
+	int DodgePlayer = 0;
 
 	int emotionLut[6]; // - макс награда эмоций
 	//std::vector<artefact>; // - какие артефакты могут выпасть
@@ -96,9 +96,9 @@ protected:
 
 	std::vector<std::string> CritPhrase; // Атаки игрока с дабл уроном
 
-	int DifficultyD20Roll = 2;
+	int DifficultyD20Roll;
 
-	float DifficultyEscape = 1.0f;
+	float DifficultyEscape;
 
 	Entity* NextAction() override;
 

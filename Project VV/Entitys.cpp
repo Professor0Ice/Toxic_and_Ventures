@@ -375,11 +375,12 @@ Entity* Enemy::NextAction()
 
     while (true) {
 
-        Nkey = terminal_read();
+        Nkey = terminal_peek();
 
         BaseIfTerminal(Nkey);
 
 		if (Nkey == TK_DOWN) {
+            terminal_read();
             if (NumButton < 4 and UpDown) {
                 focus = false;
                 NumButton++;
@@ -388,6 +389,8 @@ Entity* Enemy::NextAction()
             }
 		}
         if (Nkey == TK_UP) {
+            terminal_read();
+
             if (NumButton > 1 and UpDown) {
                 focus = false;
 				NumButton--;
@@ -397,6 +400,8 @@ Entity* Enemy::NextAction()
 		}
 
 		if (Nkey == TK_LEFT) {
+            terminal_read();
+
 			if (focus) {
 				switch (NumButton) {
 				case 1:
@@ -411,6 +416,8 @@ Entity* Enemy::NextAction()
 			}
 		}
 		if (Nkey == TK_RIGHT) {
+            terminal_read();
+
 			if (focus) {
 				switch (NumButton) {
 				case 1:
@@ -426,6 +433,8 @@ Entity* Enemy::NextAction()
 		}
 
 		if (Nkey == TK_ENTER or Nkey==TK_SPACE) {
+            terminal_read();
+
 			if(!focus){
 				switch (NumButton) {
 				case 1:
@@ -550,6 +559,7 @@ Entity* Enemy::NextAction()
 		}
 
         if (Nkey == TK_BACKSPACE or Nkey == TK_DELETE) {
+            terminal_read();
             if (focus and NumButton == 1 and emotionPhrase[LRbutton] != 0 and LRbutton!=7) {
 				emotionPhrase[LRbutton] -= 1;
                 player->AddEchoEmotion(LRbutton);

@@ -238,10 +238,12 @@ bool IsFullScreen() {
 void BaseIfTerminal(int& key) {
 
     if (key == TK_CLOSE or key == TK_ESCAPE) {
+        terminal_read();
         terminal_close();
         exit(0);
     }
     else if (key == TK_F11) {
+        terminal_read();
         fullscreen = !fullscreen;
         terminal_set(fullscreen ? "window.fullscreen=true" : "window.fullscreen=false");
         SetFontSize(fullscreen);

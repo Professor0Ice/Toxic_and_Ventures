@@ -134,32 +134,37 @@ void DrawFrameFromFile(const std::string& filename, int x, int y, bool refresh, 
     if (refresh) { terminal_refresh(); }
 }
 
-void SetFontSize() {
-	const int cellCountX = 191;
-	const int cellCountY = 56;
+void SetFontSize(bool fullscreen) {
+    const int cellCountX = 191;
+    const int cellCountY = 56;
 
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	// Вычисляем размер ячейки
-	int cellWidth = screenWidth / cellCountX;
-	int cellHeight = screenHeight / cellCountY;
+    if (screenWidth <= 0 || screenHeight <= 0) {
+        std::cerr << "Ошибка: некорректный размер экрана!" << std::endl;
+        return;
+    }
 
-	// Пробуем подобрать максимально возможный размер шрифта (примерно)
-	int fontSize = min(cellHeight, static_cast<int>(cellWidth*1.5)); // Коэффициент 2 — потому что шрифт обычно выше, чем шире
+    float scaleFactor = fullscreen ? 1.0f : 0.75f;  // 100% или 75% от экрана
+    int windowWidth = static_cast<int>(screenWidth * scaleFactor);
+    int windowHeight = static_cast<int>(screenHeight * scaleFactor);
 
-	// Собираем команду
-	std::string fontCmd = "font: fonts/UbuntuMono-Regular.ttf, size=" + std::to_string(fontSize);
-	std::string cellSizeCmd = "window.cellsize=" + std::to_string(cellWidth) + "x" + std::to_string(cellHeight);
-	std::string winSizeCmd = "window.size=" + std::to_string(cellCountX) + "x" + std::to_string(cellCountY);
+    int cellWidth = max(5, windowWidth / cellCountX);
+    int cellHeight = max(10, windowHeight / cellCountY);
+    int fontSize = min(cellHeight, static_cast<int>(cellWidth * 1.7));
 
-	// Установка параметров
-	terminal_set(fontCmd.c_str());
-	terminal_set(cellSizeCmd.c_str());
-	terminal_set(winSizeCmd.c_str());
+    std::string fontCmd = "font: fonts/UbuntuMono-Regular.ttf, size=" + std::to_string(fontSize);
+    std::string cellSizeCmd = "window.cellsize=" + std::to_string(cellWidth) + "x" + std::to_string(cellHeight);
+    std::string winSizeCmd = "window.size=" + std::to_string(cellCountX) + "x" + std::to_string(cellCountY);
 
-	std::cout << "[DEBUG] " << fontCmd << "\n";
-	std::cout << "[DEBUG] " << cellSizeCmd << "\n";
+    terminal_set(fontCmd.c_str());
+    terminal_set(cellSizeCmd.c_str());
+    terminal_set(winSizeCmd.c_str());  // Фиксируем размер окна!
+
+    std::cout << "[DEBUG] " << fontCmd << "\n";
+    std::cout << "[DEBUG] " << cellSizeCmd << "\n";
+    std::cout << "[DEBUG] " << winSizeCmd << "\n";
 }
 
 void DrawText(std::wstring text, int x, int y, bool Memory, bool refresh) {
@@ -239,17 +244,15 @@ void BaseIfTerminal(int& key) {
     else if (key == TK_F11) {
         fullscreen = !fullscreen;
         terminal_set(fullscreen ? "window.fullscreen=true" : "window.fullscreen=false");
-        if (!fullscreen) {
-            SetFontSize();
-            LoadScreen();
-        }
-        else {
-            SetFontSize();
-            LoadScreen();
-        }
-    }
-    else if (key == TK_RESIZED) {
-        SetFontSize();
+        SetFontSize(fullscreen);
         LoadScreen();
-    }  
+    }
+
+    auto now = std::chrono::steady_clock::now();
+    static auto lastRefresh = now; 
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastRefresh).count();
+    if (elapsed > 1000) {  
+        LoadScreen(); 
+        lastRefresh = now;
+    }
 }

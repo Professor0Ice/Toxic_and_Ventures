@@ -341,13 +341,9 @@ Entity* Enemy::NextAction()
     bool Bruh;
 
     std::string TagAttack;
-    AttackData Attack;
-    AttackEffect AttackEff;
+
     float Multiply = 1;
     AttackRepository Repos;
-
-    std::vector<std::wstring> phrase;
-    std::wstring line;
 
     // Интерфейс боя
 	ClearTerminal();
@@ -473,14 +469,16 @@ Entity* Enemy::NextAction()
                     else  if(LRbutton == 6 and sum > 0){
                         UpDown = false;
                         ClearAction();
-                        Attack = AttackRepository().GetAttackByTagPlayer(SelectPhrase(Repos), emotionPhrase);
+                        
+                        TagAttack = SelectPhrase(Repos);
+
                         ClearAction();
 
                         Multiply = 2;
 
                         Bruh = false;
                         for (auto i : CritPhrase) {
-                            if (i == Attack.tag) {
+                            if (i == TagAttack) {
                                 Bruh = true;
                             }
                         }
@@ -488,59 +486,13 @@ Entity* Enemy::NextAction()
                             Multiply = RollD20(DifficultyD20Roll);
                         }
 
-                        ClearAction();
+                        ResultStep(Repos, TagAttack, Multiply);
 
-                        AttackEff = Attack.EffectPlayer;
-                        
-                        AttackEff.Defense = static_cast<int>(AttackEff.Defense * Multiply);
-                        AttackEff.Dodge = static_cast<int>(AttackEff.Dodge * Multiply);
-                        AttackEff.Stress = static_cast<int>(AttackEff.Stress * Multiply);
-
-                        DamagePlayer(AttackEff);
-
-                        AttackEff = Attack.EffectEnemy;
-
-						AttackEff.Defense = static_cast<int>(AttackEff.Defense * Multiply);
-						AttackEff.Dodge = static_cast<int>(AttackEff.Dodge * Multiply);
-						AttackEff.Stress = static_cast<int>(AttackEff.Stress * Multiply);
-
-						DamageEnemy(AttackEff);
-
-                        for (int i = 0; i < 6; i++) {
-                            player->AddEchoEmotion(i,DropEmotion[i]);
+                        if (stress >= 100) {
+                            return new Entity;
                         }
-                        for (int i = 0; i < 6;i++) {
-                            DropEmotion[i] = 0;
-                            emotionPhrase[i] = 0;
-                        }
-
-                        phrase = SplitString(LoadPhrase(Attack.tag + "_full"));
-                        line = L"";
-                        int k = 0;
-
-                        for (auto i : phrase) {
-                            if (line.size() + i.size() >= 104) {
-                                DrawText(line, 46, 38 + k);
-                                k++;
-                                line = i + L" ";
-                            }
-                            else {
-                                line += i + L" ";
-                            }
-                        }
-                        if (line.size() != 0) {
-                            DrawText(line, 46, 38 + k);
-                        }
-
-                        Nkey = terminal_read();
-                        while (true) {
-                            Nkey = terminal_read(); 
-
-                            BaseIfTerminal(Nkey); 
-
-                            if (Nkey == TK_ENTER or Nkey == TK_SPACE) { 
-                                break;
-                            }
+                        if (stressPlayer >= 100) {
+                            return new Entity;
                         }
                         
 						NumButton = 0;
@@ -569,8 +521,6 @@ Entity* Enemy::NextAction()
             }
         }
     }
-    // Конец интерфейса
-    return new Entity;
 }
 
 void Enemy::UpdateStress()
@@ -1011,6 +961,378 @@ void Enemy::SelectPhraseText(std::vector<std::string>& phrase, int select)
         }
         else {
             DrawText(str, 66 + i * 30 - static_cast<int>(str.size() / 2), 49 + 2 * (i == 1));
+        }
+    }
+}
+
+void Enemy::ResultStep(AttackRepository& Repos, std::string PlayerAttack, int Multiply)
+{
+    std::vector<std::wstring> phrase;
+    std::wstring line;
+    int k;
+    int endk;
+
+    AttackData AttackPlayer;
+    AttackDataEnemy AttackEnemy;
+
+    AttackEffect AttackEffect;
+
+    AttackEnemy = Repos.GetAttackByTagEnemy(EnemyStep(Repos));
+
+    phrase = SplitString(L"[color=green](" + player->getName() + L")[/color] " + LoadPhrase(PlayerAttack + "_full"));
+    line = L"";
+    k = 0;
+
+    ClearAction();
+    for (auto i : phrase) {
+        if (line.size() + i.size() >= 104) {
+            DrawText(line, 46 + 3 * (k != 0), 38 + k);
+            k++;
+            line = i + L" ";
+        }
+        else {
+            line += i + L" ";
+        }
+    }
+    if (line.size() != 0) {
+        DrawText(line, 46 + 3 * (k != 0), 38 + k);
+        k++;
+    }
+
+    phrase = SplitString(L"[color=red](" + LoadPhrase(TagName) + L")[/color] " + LoadPhrase(AttackEnemy.tag));
+    line = L"";
+    endk = k+2;
+    k = 0;
+
+    for (auto i : phrase) {
+        if (line.size() + i.size() >= 104) {
+            DrawText(line, 46 + 3 * (k != 0), 38 + k + endk);
+            k++;
+            line = i + L" ";
+        }
+        else {
+            line += i + L" ";
+        }
+    }
+    if (line.size() != 0) {
+        DrawText(line, 46 + 3 * (k != 0), 38 + k + endk);
+    }
+
+    k = terminal_read();
+    while (true) {
+        k = terminal_read();
+
+        BaseIfTerminal(k);
+
+        if (k == TK_ENTER or k == TK_SPACE) {
+            break;
+        }
+    }
+
+    AttackPlayer = AttackRepository().GetAttackByTagPlayer(PlayerAttack, emotionPhrase);
+
+    AttackEffect = AttackPlayer.EffectPlayer;
+
+    AttackEffect.Defense = static_cast<int>(AttackEffect.Defense * Multiply);
+    AttackEffect.Dodge = static_cast<int>(AttackEffect.Dodge * Multiply);
+    AttackEffect.Stress = static_cast<int>(AttackEffect.Stress * Multiply);
+
+    DamagePlayer(AttackEffect);
+
+    AttackEffect = AttackPlayer.EffectEnemy;
+
+    AttackEffect.Defense = static_cast<int>(AttackEffect.Defense * Multiply);
+    AttackEffect.Dodge = static_cast<int>(AttackEffect.Dodge * Multiply);
+    AttackEffect.Stress = static_cast<int>(AttackEffect.Stress * Multiply);
+
+    DamageEnemy(AttackEffect);
+
+    for (int i = 0; i < 6; i++) {
+        player->AddEchoEmotion(i, DropEmotion[i]);
+    }
+    for (int i = 0; i < 6; i++) {
+        DropEmotion[i] = 0;
+        emotionPhrase[i] = 0;
+    }
+
+    
+
+    AttackEffect.Defense = AttackEnemy.EffectPlayer.Defense;
+    AttackEffect.Dodge = AttackEnemy.EffectPlayer.Dodge;
+    AttackEffect.Stress = AttackEnemy.EffectPlayer.Stress;
+
+    DamagePlayer(AttackEffect);
+
+    AttackEffect.Defense = AttackEnemy.EffectEnemy.Defense;
+    AttackEffect.Dodge = AttackEnemy.EffectEnemy.Dodge;
+    AttackEffect.Stress = AttackEnemy.EffectEnemy.Stress;
+
+    DamageEnemy(AttackEffect);
+
+    ClearAction();
+}
+
+std::string Enemy::EnemyStep(AttackRepository& Repos)
+{
+    std::string result;
+    std::vector<std::string> StockLifePhrase;
+    int r;
+
+    if (ChanceMadness >= getRandomInt(1, 20)) {
+        for (auto& i : EnemyAttackList) {
+            if (i.second > 0) {
+                StockLifePhrase.push_back(i.first);
+            }
+        }
+
+        if (StockLifePhrase.size() == 0) return "silence";
+
+        r = getRandomInt(0, StockLifePhrase.size() - 1);
+
+        for (auto& i : EnemyAttackList) {
+            if (i.first == StockLifePhrase[r]) {
+                i.second--;
+            }
+        }
+
+        return StockLifePhrase[r];
+    }
+    else {
+        switch (PsychicType)
+        {
+        case active:
+            if (stress >= 75 and stressPlayer <= 70) {
+                result = Repos.GetAttackByType(EnemyAttackList, heal);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, buff); 
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, average); 
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                if (result != "") return result;
+
+                return "silence";
+            }
+            else {
+                if (DefendPlayer >= 30 or DodgePlayer >= 50) {
+                    result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                    if (result != "") return result;
+
+                    result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                    if (result != "") return result;
+                }
+                else {
+                    result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                    if (result != "") return result;
+
+                    result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                    if (result != "") return result;
+                }
+
+                result = Repos.GetAttackByType(EnemyAttackList, average);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, buff);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, heal);
+
+                if (result != "") return result;
+
+                return "silence";
+            }
+        case passive:
+            if (stress >= 60) {
+                result = Repos.GetAttackByType(EnemyAttackList, heal);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, buff);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, average);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                if (result != "") return result;
+
+                return "silence";
+            }
+            else if (stress >= 40) {
+                result = Repos.GetAttackByType(EnemyAttackList, average);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, buff);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, heal);
+
+                if (result != "") return result;
+
+                return "silence";
+            }
+            else {
+                if (DefendPlayer >= 30 or DodgePlayer >= 50) {
+                    result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                    if (result != "") return result;
+
+                    result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                    if (result != "") return result;
+                }
+                else {
+                    result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                    if (result != "") return result;
+
+                    result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                    if (result != "") return result;
+                }
+
+                result = Repos.GetAttackByType(EnemyAttackList, average);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, buff);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, heal);
+
+                if (result != "") return result;
+
+                return "silence";
+            }
+        case normis:
+            if (stress >= 70) {
+                result = Repos.GetAttackByType(EnemyAttackList, heal);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, buff);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, average);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                if (result != "") return result;
+
+                return "silence";
+            }
+            else if (stress >= 50 and def + dodge > 40) {
+                if (DefendPlayer >= 30 or DodgePlayer >= 50) {
+                    result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                    if (result != "") return result;
+
+                    result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                    if (result != "") return result;
+                }
+                else {
+                    result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                    if (result != "") return result;
+
+                    result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                    if (result != "") return result;
+                }
+
+                result = Repos.GetAttackByType(EnemyAttackList, average);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, buff);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, heal);
+
+                if (result != "") return result;
+
+                return "silence";
+            }
+            else {
+                result = Repos.GetAttackByType(EnemyAttackList, average);
+
+                if (result != "") return result;
+
+                result = Repos.GetAttackByType(EnemyAttackList, buff);
+
+                if (result != "") return result;
+
+                if (DefendPlayer >= 30 or DodgePlayer >= 50) {
+                    result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                    if (result != "") return result;
+
+                    result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                    if (result != "") return result;
+                }
+                else {
+                    result = Repos.GetAttackByType(EnemyAttackList, damage);
+
+                    if (result != "") return result;
+
+                    result = Repos.GetAttackByType(EnemyAttackList, debuff);
+
+                    if (result != "") return result;
+                }
+
+                result = Repos.GetAttackByType(EnemyAttackList, heal);
+
+                if (result != "") return result;
+
+                return "silence";
+            }
+        default:
+            break;
         }
     }
 }

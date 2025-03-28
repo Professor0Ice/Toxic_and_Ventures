@@ -10,8 +10,10 @@ GameLogic::GameLogic()
     terminal_set("window.icon='icons/icon.ico'");
     terminal_set("input.encoding = utf-8");
     terminal_set("window.encoding=437");
-    terminal_set("window.resizeable=true");
+    terminal_set("window.resizeable=false");
+    SetFontSize(false);
     //terminal_set("window.cursor.visible=false");
+    terminal_set("window.redraw_on_focus=true");
 
     DrawFrameFromFile("ramka.txt", 0, 0);
     LoadScreen();

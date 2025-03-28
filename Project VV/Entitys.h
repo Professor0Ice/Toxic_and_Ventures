@@ -77,6 +77,9 @@ protected:
 	std::string TagSearch;
 
 	std::vector<std::pair<std::string, int >> EnemyAttackList; // tag и количество
+	int PsychicType = active;
+	int ChanceMadness = 2;
+	// Шанс, отклонения от образа атак по d20
 
 	int stress = 60; 
 	int def = 30;
@@ -98,6 +101,8 @@ protected:
 	float DifficultyEscape = 1.0f;
 
 	Entity* NextAction() override;
+
+private:
 	void UpdateStress();
 	void UpdateStressEm();
 	void LoadName();
@@ -117,6 +122,9 @@ protected:
 	float RollD20(int difficulty);
 	std::string SelectPhrase(AttackRepository& Repos);
 	void SelectPhraseText(std::vector<std::string>& phrase, int select);
+
+	void ResultStep(AttackRepository& Repos, std::string PlayerAttack, int Multiply);
+	std::string EnemyStep(AttackRepository& Repos);
 };
 
 class Mimik : public Enemy {

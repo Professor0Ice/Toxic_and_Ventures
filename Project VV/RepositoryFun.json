@@ -169,6 +169,11 @@
       "tag": "primer",
 	  "PlayerEffect": [0,0,0],
 	  "EnemyEffect": [0,0,0]
+    },
+	{
+      "tag": "silence",
+	  "PlayerEffect": [0,0,0],
+	  "EnemyEffect": [20,0,0]
     }
   ]
 }

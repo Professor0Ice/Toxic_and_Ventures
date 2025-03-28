@@ -18,6 +18,9 @@ struct AttackData {
 enum TypeAttack { damage, debuff, heal, buff, average };
 // Типы фраз 
 
+enum TypePsycho { active, passive, normis };
+// Типы поведения монстров
+
 struct AttackDataEnemy {
 	std::string tag;
 	int type;

@@ -369,6 +369,13 @@ Enemy::Enemy(const std::string& filename)
 
             PsychicType = info["Psych"].get<int>();
 
+            std::vector<std::string> AttackName = info["AttackName"].get<std::vector<std::string>>();
+            std::vector<int> AttackNum = info["AttackNumber"].get<std::vector<int>>();
+
+            for (int i = 0; i < AttackName.size(); i++) {
+                EnemyAttackList.push_back({ AttackName[i], AttackNum[i] });
+            }
+
             break;
         }
     }

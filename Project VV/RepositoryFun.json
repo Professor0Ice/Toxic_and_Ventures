@@ -178,7 +178,9 @@
             "def": [ 0, 1 ],
             "ChanceMadness": 2,
             "Psych": 1,
-            "DifficultyEscape": 1.0
+            "DifficultyEscape": 1.0,
+            "AttackName": ["silence"],
+            "AttackNumber": [5]
         },
         {
             "tag": "mim",
@@ -187,7 +189,9 @@
             "def": [ 0, 1 ],
             "ChanceMadness": 2,
             "Psych": 1,
-            "DifficultyEscape": 1.0
+            "DifficultyEscape": 1.0,
+            "AttackName": ["silence"],
+            "AttackNumber": [5]
         }
     ]
 }

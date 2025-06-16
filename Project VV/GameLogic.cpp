@@ -18,7 +18,7 @@ GameLogic::GameLogic()
     DrawFrameFromFile("ramka.txt", 0, 0);
     LoadScreen();
 
-    currentEntity = new Mimik();
+    currentEntity = new Enemy("mimik");
 
     Player* Gplayer = new Player(1);
     Gplayer->setName(L"Клоун");

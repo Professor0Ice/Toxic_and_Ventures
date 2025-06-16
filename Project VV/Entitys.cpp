@@ -332,6 +332,49 @@ Entity* Entity::NextAction()
     return new Entity;
 }
 
+Enemy::Enemy(const std::string& filename)
+{
+    TagName = filename;
+    EnemyFileName = filename + ".txt";
+    phraseName = TagName + "_welcome";
+
+    std::ifstream file("RepositoryFun.json");
+    if (!file.is_open()) {
+        throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
+    }
+    std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    json data;
+    try {
+        data = json::parse(utf8Content);
+    }
+    catch (const json::parse_error& e) {
+        throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
+    }
+
+    std::array<int, 2> Range;
+    for (const auto& info : data["Enemy"]) {
+        if (info["tag"].get<std::string>() == TagName){
+            
+            Range = info["stress"].get<std::array<int, 2>>();
+            stress = getRandomInt(Range[0], Range[1]);
+
+            Range = info["dodge"].get<std::array<int, 2>>();
+            dodge = getRandomInt(Range[0], Range[1]);
+
+            Range = info["def"].get<std::array<int, 2>>();
+            def = getRandomInt(Range[0], Range[1]);
+            ChanceMadness = info["ChanceMadness"].get<int>();
+            DifficultyEscape = info["DifficultyEscape"].get<float>();
+
+            PsychicType = info["Psych"].get<int>();
+
+            break;
+        }
+    }
+    
+}
+
 Entity* Enemy::NextAction()
 {
     int Nkey;
@@ -388,7 +431,7 @@ Entity* Enemy::NextAction()
                 ClearAction();
             }
 		}
-        if (Nkey == TK_UP) {
+        else if (Nkey == TK_UP) {
             terminal_read();
 
             if (NumButton > 1 and UpDown) {
@@ -399,7 +442,7 @@ Entity* Enemy::NextAction()
 			}
 		}
 
-		if (Nkey == TK_LEFT) {
+		else if (Nkey == TK_LEFT) {
             terminal_read();
 
 			if (focus) {
@@ -415,7 +458,7 @@ Entity* Enemy::NextAction()
 				}
 			}
 		}
-		if (Nkey == TK_RIGHT) {
+        else if (Nkey == TK_RIGHT) {
             terminal_read();
 
 			if (focus) {
@@ -432,7 +475,7 @@ Entity* Enemy::NextAction()
 			}
 		}
 
-		if (Nkey == TK_ENTER or Nkey==TK_SPACE) {
+        else if (Nkey == TK_ENTER or Nkey==TK_SPACE) {
             terminal_read();
 
 			if(!focus){
@@ -474,7 +517,7 @@ Entity* Enemy::NextAction()
 					Multiply = RollD20(20);
 
 					if (Multiply >= DifficultyEscape) {
-						return new Mimik;
+						return new Enemy("mimik");
 					}
 					else {
 						NumButton = 0;
@@ -535,10 +578,10 @@ Entity* Enemy::NextAction()
                         ResultStep(Repos, TagAttack, Multiply);
 
                         if (stress >= 100) {
-                            return new Mimik;
+                            return new Enemy("mimik");
                         }
                         if (stressPlayer >= 100) {
-                            return new Mimik;
+                            return new Enemy("mimik");
                         }
                         
 						NumButton = 0;
@@ -558,7 +601,7 @@ Entity* Enemy::NextAction()
             }
 		}
 
-        if (Nkey == TK_BACKSPACE or Nkey == TK_DELETE) {
+        else if (Nkey == TK_BACKSPACE or Nkey == TK_DELETE) {
             terminal_read();
             if (focus and NumButton == 1 and emotionPhrase[LRbutton] != 0 and LRbutton!=7) {
 				emotionPhrase[LRbutton] -= 1;
@@ -566,6 +609,10 @@ Entity* Enemy::NextAction()
                 UpdateEmotion();
 				LoadEmotionV();
             }
+        }
+
+        else if (Nkey != 0) {
+            terminal_read();
         }
     }
 }
@@ -909,6 +956,9 @@ float Enemy::RollD20(int difficulty)
 			else {
 				return -0.2f;
 			}
+        }
+        else if (Nkey != 0) {
+            terminal_read();
         }
 
 		delay(280);
@@ -1415,21 +1465,3 @@ void Enemy::UpdateStressEm()
 	}
 }
 
-Mimik::Mimik()
-{
-    TagName = "mimik";
-	EnemyFileName = "mimik.txt";
-	EnemyCoord[0] = 1;
-	EnemyCoord[1] = 0;
-    stress = getRandomInt(30,50);
-    dodge = getRandomInt(0, 10);
-    def = 0;
-
-    PsychicType = active;
-    ChanceMadness = 2;
-
-    DifficultyD20Roll = 2;
-    DifficultyEscape = 1.0f;
-
-    phraseName = TagName + "_welcome";
-}

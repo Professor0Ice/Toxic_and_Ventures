@@ -68,15 +68,20 @@ protected:
 };
 
 class Enemy : public Entity {
+public:
+	Enemy(const std::string& filename); // загружаем данные отсюда
+
 protected:
 	std::string TagName;
 	//PhaseName - начального для описания уже есть
 	std::string EnemyFileName;
-	int EnemyCoord[2];
+
+	int EnemyCoord[2] = { 1, 0 };
 
 	std::string TagSearch;
 
 	std::vector<std::pair<std::string, int >> EnemyAttackList; // tag и количество
+
 	int PsychicType;
 	int ChanceMadness;
 	// Шанс, отклонения от образа атак по d20
@@ -96,7 +101,7 @@ protected:
 
 	std::vector<std::string> CritPhrase; // Атаки игрока с дабл уроном
 
-	int DifficultyD20Roll;
+	int DifficultyD20Roll = 2;
 
 	float DifficultyEscape;
 
@@ -127,7 +132,3 @@ private:
 	std::string EnemyStep(AttackRepository& Repos);
 };
 
-class Mimik : public Enemy {
-public:
-	Mimik();
-};

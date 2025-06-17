@@ -70,7 +70,7 @@ protected:
 class Enemy : public Entity {
 public:
 	Enemy(const std::string& filename); // загружаем данные отсюда
-
+	bool ShouldSpawnNextEnemy() const;
 protected:
 	std::string TagName;
 	//PhaseName - начального дл€ описани€ уже есть
@@ -127,6 +127,11 @@ private:
 	float RollD20(int difficulty);
 	std::string SelectPhrase(AttackRepository& Repos);
 	void SelectPhraseText(std::vector<std::string>& phrase, int select);
+
+	// ѕеременные дл€ отслеживани€ состо€ни€ бо€
+	bool m_isDefeated = false;
+	float m_defeatTimer = 0.0f;
+	const float DEFEAT_DELAY = 2.0f; // «адержка после победы перед спавном нового врага
 
 	void ResultStep(AttackRepository& Repos, std::string PlayerAttack, int Multiply);
 	std::string EnemyStep(AttackRepository& Repos);

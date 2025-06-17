@@ -279,11 +279,15 @@ void Player::getLifeTime()
     Time += static_cast<int>(currentSessionLifetime);
 }
 
-Entity* Entity::start(Player* playerN)
+bool Entity::start(Player* playerN, std::string phraseTag)
 {
     int Nkey;
 
     player = playerN;
+
+    if (phraseTag != "") {
+        phraseName = phraseTag;
+    }
 
     // Интерфейс диалога
     ClearTerminal();
@@ -326,10 +330,10 @@ Entity* Entity::start(Player* playerN)
     return NextAction();
 }
 
-Entity* Entity::NextAction()
+bool Entity::NextAction()
 {
-    std::cout << "Entity is destroyed";
-    return new Entity;
+    std::cout << "Диалог скип" << std::endl;
+    return true;
 }
 
 Enemy::Enemy(const std::string& filename)
@@ -382,7 +386,7 @@ Enemy::Enemy(const std::string& filename)
     
 }
 
-Entity* Enemy::NextAction()
+bool Enemy::NextAction()
 {
     int Nkey;
     int sum;
@@ -524,7 +528,7 @@ Entity* Enemy::NextAction()
 					Multiply = RollD20(20);
 
 					if (Multiply >= DifficultyEscape) {
-						return new Enemy("mimik");
+						return true;
 					}
 					else {
 						NumButton = 0;
@@ -582,13 +586,16 @@ Entity* Enemy::NextAction()
                             Multiply = RollD20(DifficultyD20Roll);
                         }
 
+                        
                         ResultStep(Repos, TagAttack, Multiply);
 
+
+                        
                         if (stress >= 100) {
-                            return new Enemy("mimik");
+                            return true;
                         }
                         if (stressPlayer >= 100) {
-                            return new Enemy("mimik");
+                            return false;
                         }
                         
 						NumButton = 0;
@@ -1204,13 +1211,12 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
                 i.second--;
             }
         }
-
         return StockLifePhrase[r];
     }
     else {
         switch (PsychicType)
         {
-        case active:
+        case 0:
             if (stress >= 75 and stressPlayer <= 70) {
                 result = Repos.GetAttackByType(EnemyAttackList, heal);
 
@@ -1268,7 +1274,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 return "silence";
             }
-        case passive:
+        case 1:
             if (stress >= 60) {
                 result = Repos.GetAttackByType(EnemyAttackList, heal);
 
@@ -1349,7 +1355,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 return "silence";
             }
-        case normis:
+        case 2:
             if (stress >= 70) {
                 result = Repos.GetAttackByType(EnemyAttackList, heal);
 
@@ -1442,7 +1448,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
                 return "silence";
             }
         default:
-            break;
+            return "silence";
         }
     }
 }

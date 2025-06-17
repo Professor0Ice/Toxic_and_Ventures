@@ -160,105 +160,102 @@
     ],
     "EnemyAttack": [
         {
-            "tag": "primer",
-            "PlayerEffect": [ 0, 0, 0 ],
-            "EnemyEffect": [ 0, 0, 0 ]
-        },
-        {
             "tag": "silence",
+            "type": 0,
             "PlayerEffect": [ 0, 0, 0 ],
             "EnemyEffect": [ 20, 0, 0 ]
         }
     ],
-  "Enemy": [
-    {
-      "tag": "mimik",
-      "stress": [ 30, 50 ],
-      "dodge": [ 0, 10 ],
-      "def": [ 0, 1 ],
-      "ChanceMadness": 2,
-      "Psych": 1,
-      "DifficultyEscape": 1.0,
-      "AttackName": [ "silence" ],
-      "AttackNumber": [ 5 ]
-    },
-    {
-      "tag": "mim",
-      "stress": [ 30, 50 ],
-      "dodge": [ 0, 10 ],
-      "def": [ 0, 1 ],
-      "ChanceMadness": 2,
-      "Psych": 1,
-      "DifficultyEscape": 1.0,
-      "AttackName": [ "silence" ],
-      "AttackNumber": [ 5 ]
-    },
-    {
-      "tag": "goblin",
-      "stress": [ 30, 50 ],
-      "dodge": [ 0, 10 ],
-      "def": [ 0, 1 ],
-      "ChanceMadness": 2,
-      "Psych": 1,
-      "DifficultyEscape": 1.0,
-      "AttackName": [ "silence" ],
-      "AttackNumber": [ 5 ]
-    },
-    {
-      "tag": "hound", 
-      "stress": [ 30, 50 ],
-      "dodge": [ 10, 20 ],
-      "def": [ 0, 2 ],
-      "ChanceMadness": 1,
-      "Psych": 2,
-      "DifficultyEscape": 1.2,
-      "AttackName": [ "silence" ],
-      "AttackNumber": [ 5 ]
-    },
-    {
-      "tag": "tarantul",
-      "stress": [ 40, 60 ],
-      "dodge": [ 5, 15 ],
-      "def": [ 1, 3 ],
-      "ChanceMadness": 3,
-      "Psych": 2,
-      "DifficultyEscape": 1.5,
-      "AttackName": [ "silence" ],
-      "AttackNumber": [ 5 ]
-    },
-    {
-      "tag": "golem",
-      "stress": [ 50, 70 ],
-      "dodge": [ 0, 5 ],
-      "def": [ 3, 5 ],
-      "ChanceMadness": 1,
-      "Psych": 0,
-      "DifficultyEscape": 2.0,
-      "AttackName": [ "silence" ],
-      "AttackNumber": [ 5 ]
-    },
-    {
-      "tag": "drunk_elf",
-      "stress": [ 0, 30 ],
-      "dodge": [ 15, 25 ],
-      "def": [ 0, 1 ],
-      "ChanceMadness": 5,
-      "Psych": 3,
-      "DifficultyEscape": 0.8,
-      "AttackName": [ "silence" ],
-      "AttackNumber": [ 5 ]
-    },
-    {
-      "tag": "gargoyle",
-      "stress": [ 30, 60 ],
-      "dodge": [ 5, 10 ],
-      "def": [ 2, 4 ],
-      "ChanceMadness": 3,
-      "Psych": 5,
-      "DifficultyEscape": 1.3,
-      "AttackName": [ "silence" ],
-      "AttackNumber": [ 5 ]
-    }
-  ]
+    "Enemy": [
+        {
+            "tag": "mimik",
+            "stress": [ 30, 50 ],
+            "dodge": [ 0, 10 ],
+            "def": [ 0, 1 ],
+            "ChanceMadness": 2,
+            "Psych": 1,
+            "DifficultyEscape": 1.0,
+            "AttackName": [ "silence" ],
+            "AttackNumber": [ 5 ]
+        },
+        {
+            "tag": "goblin",
+            "stress": [ 30, 50 ],
+            "dodge": [ 0, 10 ],
+            "def": [ 0, 1 ],
+            "ChanceMadness": 2,
+            "Psych": 1,
+            "DifficultyEscape": 1.0,
+            "AttackName": [ "silence" ],
+            "AttackNumber": [ 5 ]
+        },
+        {
+            "tag": "hound",
+            "stress": [ 30, 50 ],
+            "dodge": [ 10, 20 ],
+            "def": [ 0, 2 ],
+            "ChanceMadness": 1,
+            "Psych": 0,
+            "DifficultyEscape": 1.2,
+            "AttackName": [ "silence" ],
+            "AttackNumber": [ 5 ]
+        },
+        {
+            "tag": "tarantul",
+            "stress": [ 40, 60 ],
+            "dodge": [ 5, 15 ],
+            "def": [ 1, 3 ],
+            "ChanceMadness": 3,
+            "Psych": 0,
+            "DifficultyEscape": 1.5,
+            "AttackName": [ "silence" ],
+            "AttackNumber": [ 5 ]
+        },
+        {
+            "tag": "golem",
+            "stress": [ 50, 70 ],
+            "dodge": [ 0, 5 ],
+            "def": [ 3, 5 ],
+            "ChanceMadness": 1,
+            "Psych": 0,
+            "DifficultyEscape": 2.0,
+            "AttackName": [ "silence" ],
+            "AttackNumber": [ 5 ]
+        },
+        {
+            "tag": "drunk_elf",
+            "stress": [ 0, 30 ],
+            "dodge": [ 15, 25 ],
+            "def": [ 0, 1 ],
+            "ChanceMadness": 5,
+            "Psych": 0,
+            "DifficultyEscape": 0.8,
+            "AttackName": [ "silence" ],
+            "AttackNumber": [ 5 ]
+        },
+        {
+            "tag": "gargoyle",
+            "stress": [ 30, 60 ],
+            "dodge": [ 5, 10 ],
+            "def": [ 2, 4 ],
+            "ChanceMadness": 3,
+            "Psych": 0,
+            "DifficultyEscape": 1.3,
+            "AttackName": [ "silence" ],
+            "AttackNumber": [ 5 ]
+        }
+    ],
+    "dungeon": [
+        {
+            "name": "beta",
+            "numberOfFloors": 2,
+            "welcome": "welcome_base",
+            "death": "death_base",
+            "final": "win_base",
+            "transition": [ "transitionBase", "transitionBase" ],
+            "floor1": [ "mimik", "gargoyle" ],
+            "floor2": [ "drunk_elf", "golem" ]
+        }
+    ]
 }
 

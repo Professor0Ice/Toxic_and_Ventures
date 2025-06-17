@@ -60,17 +60,16 @@ private:
 
 class Entity {
 public:
-	Entity* start(Player* playerN);
+	bool start(Player* playerN, std::string phraseTag = "");
 protected:
 	std::string phraseName = "welcome";
-	virtual Entity* NextAction();
+	virtual bool NextAction();
 	Player* player;
 };
 
 class Enemy : public Entity {
 public:
 	Enemy(const std::string& filename); // загружаем данные отсюда
-	bool ShouldSpawnNextEnemy() const;
 protected:
 	std::string TagName;
 	//PhaseName - начального для описания уже есть
@@ -105,7 +104,7 @@ protected:
 
 	float DifficultyEscape;
 
-	Entity* NextAction() override;
+	bool NextAction() override;
 
 private:
 	void UpdateStress();

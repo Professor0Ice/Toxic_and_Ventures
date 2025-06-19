@@ -130,8 +130,8 @@
         {
             "tag": "ULTA",
             "minEmotion": [ 1, 1, 1, 1, 1, 1 ],
-            "PlayerEffect": [ 0, 0, 0 ],
-            "EnemyEffect": [ 0, 0, 0 ]
+            "PlayerEffect": [ -10, 3, 3 ],
+            "EnemyEffect": [ 10, -5, -7 ]
         },
         {
             "tag": "zero_1",
@@ -143,7 +143,7 @@
             "tag": "zero_2",
             "minEmotion": [ 0, 0, 0, 0, 0, 0 ],
             "PlayerEffect": [ -5, 0, 0 ],
-            "EnemyEffect": [ 0, 0, 0 ]
+            "EnemyEffect": [ 2, 0, 0 ]
         },
         {
             "tag": "zero_3",
@@ -155,17 +155,125 @@
             "tag": "zero_4",
             "minEmotion": [ 0, 0, 0, 0, 0, 0 ],
             "PlayerEffect": [ -5, 0, 5 ],
-            "EnemyEffect": [ 0, 0, 0 ]
+            "EnemyEffect": [ 2, 0, 0 ]
         }
     ],
-    "EnemyAttack": [
-        {
-            "tag": "silence",
-            "type": 0,
-            "PlayerEffect": [ 0, 0, 0 ],
-            "EnemyEffect": [ 20, 0, 0 ]
-        }
-    ],
+  "EnemyAttack": [
+    {
+      "tag": "silence",
+      "type": 0,
+      "PlayerEffect": [ 0, 0, 0 ],
+      "EnemyEffect": [ 20, 0, 0 ]
+    },
+    {
+      "tag": "woof_1",
+      "type": 1,
+      "PlayerEffect": [ 5, 0, 0 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "woof_2",
+      "type": 2,
+      "PlayerEffect": [ 0, -7, -7 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "woof_3",
+      "type": 3,
+      "PlayerEffect": [ 0, 0, 0 ],
+      "EnemyEffect": [ 0, 5, 5 ]
+    },
+    {
+      "tag": "gargoyle_atk_1",
+      "type": 0,
+      "PlayerEffect": [ 10, -10, 0 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "gargoyle_atk_2",
+      "type": 0,
+      "PlayerEffect": [ 0, -10, -10 ],
+      "EnemyEffect": [ 0, 5, 5 ]
+    },
+    {
+      "tag": "gargoyle_atk_3",
+      "type": 0,
+      "PlayerEffect": [ 10, 0, 0 ],
+      "EnemyEffect": [ 10, 0, 0 ]
+    },
+    {
+      "tag": "tarantul_atk_1",
+      "type": 1,
+      "PlayerEffect": [ 10, 0, 0 ],
+      "EnemyEffect": [ 10, 0, 0 ]
+    },
+    {
+      "tag": "tarantul_atk_2",
+      "type": 1,
+      "PlayerEffect": [ 0, -5, -7 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "tarantul_atk_3",
+      "type": 1,
+      "PlayerEffect": [ 0, 0, 0 ],
+      "EnemyEffect": [ 5, 5, 5 ]
+    },
+    {
+      "tag": "goblin_atk_1",
+      "type": 1,
+      "PlayerEffect": [ 5, 0, 0 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "goblin_atk_2",
+      "type": 1,
+      "PlayerEffect": [ 0, -5, -5 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "goblin_atk_3",
+      "type": 1,
+      "PlayerEffect": [ 0, 0, 0 ],
+      "EnemyEffect": [ 0, 5, 5 ]
+    },
+    {
+      "tag": "golem_atk_1",
+      "type": 1,
+      "PlayerEffect": [ 0, 0, 0 ],
+      "EnemyEffect": [ 10, 0, 0 ]
+    },
+    {
+      "tag": "golem_atk_2",
+      "type": 1,
+      "PlayerEffect": [ 0, -5, -5 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "golem_atk_3",
+      "type": 1,
+      "PlayerEffect": [ 0, 0, 0 ],
+      "EnemyEffect": [ 0, 5, 5 ]
+    },
+    {
+      "tag": "drunk_elf_atk_1",
+      "type": 1,
+      "PlayerEffect": [ 3, 0, 0 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "drunk_elf_atk_2",
+      "type": 1,
+      "PlayerEffect": [ 0, -5, -3 ],
+      "EnemyEffect": [ 0, 0, 0 ]
+    },
+    {
+      "tag": "drunk_elf_atk_3",
+      "type": 1,
+      "PlayerEffect": [ 0, 0, 0 ],
+      "EnemyEffect": [ 0, 10, 7 ]
+    }
+  ],
     "Enemy": [
         {
             "tag": "mimik",
@@ -185,9 +293,9 @@
             "def": [ 0, 1 ],
             "ChanceMadness": 2,
             "Psych": 1,
-            "DifficultyEscape": 1.0,
-            "AttackName": [ "silence" ],
-            "AttackNumber": [ 5 ]
+            "DifficultyEscape": 2.0,
+            "AttackName": [ "goblin_atk_1", "goblin_atk_2", "goblin_atk_3", "silence" ],
+            "AttackNumber": [ 3, 3, 1, 5 ]
         },
         {
             "tag": "hound",
@@ -196,9 +304,9 @@
             "def": [ 0, 2 ],
             "ChanceMadness": 1,
             "Psych": 0,
-            "DifficultyEscape": 1.2,
-            "AttackName": [ "silence" ],
-            "AttackNumber": [ 5 ]
+            "DifficultyEscape": 5.0,
+            "AttackName": [ "woof_1", "woof_2", "woof_3", "silence" ],
+            "AttackNumber": [ 5, 3, 1, 5 ]
         },
         {
             "tag": "tarantul",
@@ -218,9 +326,9 @@
             "def": [ 3, 5 ],
             "ChanceMadness": 1,
             "Psych": 0,
-            "DifficultyEscape": 2.0,
-            "AttackName": [ "silence" ],
-            "AttackNumber": [ 5 ]
+            "DifficultyEscape": 4.0,
+            "AttackName": [ "silence" ], 
+            "AttackNumber": [ 2 ]
         },
         {
             "tag": "drunk_elf",
@@ -229,7 +337,7 @@
             "def": [ 0, 1 ],
             "ChanceMadness": 5,
             "Psych": 0,
-            "DifficultyEscape": 0.8,
+            "DifficultyEscape": 2.0,
             "AttackName": [ "silence" ],
             "AttackNumber": [ 5 ]
         },
@@ -240,22 +348,23 @@
             "def": [ 2, 4 ],
             "ChanceMadness": 3,
             "Psych": 0,
-            "DifficultyEscape": 1.3,
-            "AttackName": [ "silence" ],
-            "AttackNumber": [ 5 ]
+            "DifficultyEscape": 9.0,
+            "AttackName": [ "gargoyle_atk_1", "gargoyle_atk_2", "gargoyle_atk_3", "silence" ],
+            "AttackNumber": [ 3, 3, 3, 2 ]
         }
     ],
     "dungeon": [
-        {
-            "name": "beta",
-            "numberOfFloors": 2,
-            "welcome": "welcome_base",
-            "death": "death_base",
-            "final": "win_base",
-            "transition": [ "transitionBase", "transitionBase" ],
-            "floor1": [ "mimik", "gargoyle" ],
-            "floor2": [ "drunk_elf", "golem" ]
-        }
+      {
+        "name": "beta",
+        "numberOfFloors": 3,
+        "welcome": "welcome_base",
+        "death": "death_base",
+        "final": "win_base",
+        "transition": [ "transitionBase", "transitionBase", "transitionBase" ],
+        "floor1": [ "goblin", "mimik", "hound" ],
+        "floor2": [ "drunk_elf", "golem", "gargoyle" ],
+        "floor3": [  "golem", "tarantul", "gargoyle" ]
+      }
     ]
 }
 

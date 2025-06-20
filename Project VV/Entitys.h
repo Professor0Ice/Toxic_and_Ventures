@@ -13,16 +13,19 @@ public:
 	void setName(std::wstring w);
 	void getEmotions(int* emotionsOut, int* echoEmotionsOut);
 	void setEmotions(const int newEmotions[6], const int newEchoEmotions[6]);
+	void addEmotions(std::array<int, 6> newEmotions);
 	int getHP();
 	void RemoveHP();
 	int getMaxArtefacts();
 	void setMaxArtefacts(int Max);
 	std::vector<int> getArtefacts();
 	void setArtefacts(std::vector<int> ar);
-	int getMaxVanInteract();
-	void setMaxVanInteract(int Max);
-	std::vector<int> getVanInteract();
-	void setVanInteract(std::vector<int> ar);
+	int getMaxItems();
+	void setMaxItems(int Max);
+	std::vector<std::string> getItems();
+	void setItems(std::vector<std::string> ar);
+	void addItems(std::string item);
+	void removeItem();
 	int getPhrase();
 	void AdditionPhase(int phaseNew);
 	int getTime();
@@ -36,16 +39,16 @@ public:
 	void AddEchoEmotion(int Emotion, int num = 1);
 private:
 	std::string filename;
-	std::wstring name;
-	int emotions[6];
-	int echo_emotions[6];
+	std::wstring name = L"-";
+	int emotions[6] = { 0,0,0,0,0,0 };
+	int echo_emotions[6] = { 0,0,0,0,0,0 };
 	int MaxEmotion;
-	int hp;
-	int MaxArtefacts;
+	int hp = 3;
+	int MaxArtefacts = 3;
 	std::vector<int> artefacts;
-	int MaxVanInteract;
-	std::vector<int> VanInteract;
-	int Phrase; // кол. фраз
+	int MaxItems = 3;
+	std::vector<std::string> Items;
+	int Phrase = 0; // кол. фраз
 	std::chrono::time_point<std::chrono::steady_clock> creationTime;
 	int Time;
 	int ModD20;
@@ -93,7 +96,7 @@ protected:
 	int DefendPlayer = 0;
 	int DodgePlayer = 0;
 
-	int emotionLut[6]; // - макс награда эмоций
+	std::string reward; // - награда
 	//std::vector<artefact>; // - какие артефакты могут выпасть
 
 	//std::vector<enchant>; // - зачарование монстра
@@ -120,6 +123,7 @@ private:
 	void LoadEmotionV();
 	void UpdateEmotionVisual();
 	void ClearAction();
+	void ItemUse();
 
 	void DamagePlayer(AttackEffect damage);
 	void DamageEnemy(AttackEffect damage);

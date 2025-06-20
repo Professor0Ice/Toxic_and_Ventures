@@ -284,7 +284,8 @@
             "Psych": 1,
             "DifficultyEscape": 1.0,
             "AttackName": [ "silence" ],
-            "AttackNumber": [ 5 ]
+            "AttackNumber": [ 5 ],
+            "reward": "base_pack"
         },
         {
             "tag": "goblin",
@@ -295,7 +296,8 @@
             "Psych": 1,
             "DifficultyEscape": 2.0,
             "AttackName": [ "goblin_atk_1", "goblin_atk_2", "goblin_atk_3", "silence" ],
-            "AttackNumber": [ 3, 3, 1, 5 ]
+            "AttackNumber": [ 3, 3, 1, 5 ],
+            "reward": "base_pack"
         },
         {
             "tag": "hound",
@@ -306,7 +308,8 @@
             "Psych": 0,
             "DifficultyEscape": 5.0,
             "AttackName": [ "woof_1", "woof_2", "woof_3", "silence" ],
-            "AttackNumber": [ 5, 3, 1, 5 ]
+            "AttackNumber": [ 5, 3, 1, 5 ],
+            "reward": "base_pack"
         },
         {
             "tag": "tarantul",
@@ -317,7 +320,8 @@
             "Psych": 0,
             "DifficultyEscape": 1.5,
             "AttackName": [ "silence" ],
-            "AttackNumber": [ 5 ]
+            "AttackNumber": [ 5 ],
+            "reward": "base_pack"
         },
         {
             "tag": "golem",
@@ -328,7 +332,8 @@
             "Psych": 0,
             "DifficultyEscape": 4.0,
             "AttackName": [ "silence" ], 
-            "AttackNumber": [ 2 ]
+            "AttackNumber": [ 2 ],
+            "reward": "base_pack"
         },
         {
             "tag": "drunk_elf",
@@ -339,7 +344,8 @@
             "Psych": 0,
             "DifficultyEscape": 2.0,
             "AttackName": [ "silence" ],
-            "AttackNumber": [ 5 ]
+            "AttackNumber": [ 5 ],
+            "reward": "base_pack"
         },
         {
             "tag": "gargoyle",
@@ -350,7 +356,8 @@
             "Psych": 0,
             "DifficultyEscape": 9.0,
             "AttackName": [ "gargoyle_atk_1", "gargoyle_atk_2", "gargoyle_atk_3", "silence" ],
-            "AttackNumber": [ 3, 3, 3, 2 ]
+            "AttackNumber": [ 3, 3, 3, 2 ],
+            "reward": "base_pack"
         }
     ],
     "dungeon": [
@@ -364,6 +371,13 @@
         "floor1": [ "goblin", "mimik", "hound" ],
         "floor2": [ "drunk_elf", "golem", "gargoyle" ],
         "floor3": [  "golem", "tarantul", "gargoyle" ]
+      }
+    ],
+    "items": [
+      {
+        "name": "base_pack",
+        "minEmotion": [0,0,0,0,0,0],
+        "maxEmotion": [3,3,3,3,3,3]
       }
     ]
 }

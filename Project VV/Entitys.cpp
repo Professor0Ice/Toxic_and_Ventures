@@ -20,24 +20,6 @@ void delay(int milliseconds) {
 
 Player::Player(int SaveFileN) {
     filename = "Save" + std::to_string(SaveFileN);
-
-    name = L"-";
-    emotions[0] = 0;
-    emotions[1] = 0;
-    emotions[2] = 0;
-    emotions[3] = 0;
-    emotions[4] = 0;
-    emotions[5] = 0;
-    echo_emotions[0] = 0;
-    echo_emotions[1] = 0;
-    echo_emotions[2] = 0;
-    echo_emotions[3] = 0;
-    echo_emotions[4] = 0;
-    echo_emotions[5] = 0;
-    hp = 3;
-    MaxArtefacts = 3;
-    MaxVanInteract = 2;
-    Phrase = 0; // кол. фраз
 }
 
 void Player::save()
@@ -112,6 +94,13 @@ void Player::setEmotions(const int newEmotions[6], const int newEchoEmotions[6])
     }
 }
 
+void Player::addEmotions(std::array<int, 6> newEmotions)
+{
+    for (int i = 0; i < 6; ++i) {
+        emotions[i] += newEmotions[i];
+    }
+}
+
 int Player::getHP()
 {
     return hp;
@@ -142,24 +131,38 @@ void Player::setArtefacts(std::vector<int> ar)
     artefacts = ar;
 }
 
-int Player::getMaxVanInteract()
+int Player::getMaxItems()
 {
-    return MaxVanInteract;
+    return MaxItems;
 }
 
-void Player::setMaxVanInteract(int Max)
+void Player::setMaxItems(int Max)
 {
-    MaxVanInteract = Max;
+    MaxItems = Max;
 }
 
-std::vector<int> Player::getVanInteract()
+std::vector<std::string> Player::getItems()
 {
-    return VanInteract;
+    return Items;
 }
 
-void Player::setVanInteract(std::vector<int> ar)
+void Player::setItems(std::vector<std::string> ar)
 {
-    VanInteract = ar;
+    Items = ar;
+}
+
+void Player::addItems(std::string item)
+{
+    if (Items.size() <= MaxItems) {
+        Items.push_back(item);
+    }
+}
+
+void Player::removeItem()
+{
+    if (Items.size() != 0) {
+        Items.pop_back();
+    }
 }
 
 int Player::getPhrase()
@@ -380,6 +383,8 @@ Enemy::Enemy(const std::string& filename)
                 EnemyAttackList.push_back({ AttackName[i], AttackNum[i] });
             }
 
+            reward = info["reward"].get<std::string>();
+
             break;
         }
     }
@@ -498,6 +503,20 @@ bool Enemy::NextAction()
 					LRbutton = 4;
 					LoadEmotionV();
 					break;
+                case 2:
+                    ClearAction();
+                    DrawText(LoadPhrase("inventoryDespriction") + std::to_wstring(player->getItems().size()), 47, 39);
+                    DrawText(LoadPhrase("inventoryPd"), 47, 41);
+                    Nkey = terminal_read();
+
+                    if (Nkey == TK_SPACE and player->getItems().size() > 0) {
+                        ItemUse();
+                    }
+                    
+                    UpdateEmotion();
+                    UpdateButton();
+                    ClearAction();
+                    break;
                 case 3:
                     phrase = SplitString(L"[color=green](" + player->getName() + L")[/color] " + LoadPhrase(TagName + "_desp"));
                     line = L"";
@@ -592,6 +611,7 @@ bool Enemy::NextAction()
 
                         
                         if (stress >= 100) {
+                            player->addItems(reward);
                             return true;
                         }
                         if (stressPlayer >= 100) {
@@ -817,6 +837,39 @@ void Enemy::ClearAction()
 		DrawText(space * 106, 45, 37 + i);
 	}
     DrawFrameFromFile("fight action.txt",45,36);
+}
+
+void Enemy::ItemUse()
+{
+    std::string active = player->getItems()[player->getItems().size() - 1];
+    player->removeItem();
+
+    std::ifstream file("RepositoryFun.json");
+    if (!file.is_open()) {
+        throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
+    }
+    std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    json data;
+    try {
+        data = json::parse(utf8Content);
+    }
+    catch (const json::parse_error& e) {
+        throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
+    }
+
+    for (const auto& info : data["items"]) {
+        if (info["name"].get<std::string>() == active) {
+            std::array<int, 6> RangeMax = info["maxEmotion"].get<std::array<int, 6>>();
+            std::array<int, 6> Range = info["minEmotion"].get<std::array<int, 6>>();
+
+            for (int i = 0; i < Range.size(); i++) {
+                Range[i] = getRandomInt(Range[i], RangeMax[i]);
+            }
+
+            player->addEmotions(Range);
+        }
+    }
 }
 
 std::vector<int> generateShuffledArray(int n) {
@@ -1202,7 +1255,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
             }
         }
 
-        if (StockLifePhrase.size() == 0) return "silence";
+        if (StockLifePhrase.size() == 0) return "";
 
         r = getRandomInt(0, StockLifePhrase.size() - 1);
 
@@ -1238,7 +1291,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 if (result != "") return result;
 
-                return "silence";
+                return "";
             }
             else {
                 if (DefendPlayer >= 30 or DodgePlayer >= 50) {
@@ -1272,7 +1325,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 if (result != "") return result;
 
-                return "silence";
+                return "";
             }
         case 1:
             if (stress >= 60) {
@@ -1296,7 +1349,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 if (result != "") return result;
 
-                return "silence";
+                return "";
             }
             else if (stress >= 40) {
                 result = Repos.GetAttackByType(EnemyAttackList, average);
@@ -1319,7 +1372,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 if (result != "") return result;
 
-                return "silence";
+                return "";
             }
             else {
                 if (DefendPlayer >= 30 or DodgePlayer >= 50) {
@@ -1353,7 +1406,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 if (result != "") return result;
 
-                return "silence";
+                return "";
             }
         case 2:
             if (stress >= 70) {
@@ -1377,7 +1430,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 if (result != "") return result;
 
-                return "silence";
+                return "";
             }
             else if (stress >= 50 and def + dodge > 40) {
                 if (DefendPlayer >= 30 or DodgePlayer >= 50) {
@@ -1411,7 +1464,7 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 if (result != "") return result;
 
-                return "silence";
+                return "";
             }
             else {
                 result = Repos.GetAttackByType(EnemyAttackList, average);
@@ -1445,10 +1498,10 @@ std::string Enemy::EnemyStep(AttackRepository& Repos)
 
                 if (result != "") return result;
 
-                return "silence";
+                return "";
             }
         default:
-            return "silence";
+            return "";
         }
     }
 }

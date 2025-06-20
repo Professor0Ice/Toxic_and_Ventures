@@ -319,7 +319,7 @@
             "ChanceMadness": 3,
             "Psych": 0,
             "DifficultyEscape": 1.5,
-            "AttackName": [ "silence" ],
+            "AttackName": [ "tarantul_atk_1" ],
             "AttackNumber": [ 5 ],
             "reward": "base_pack"
         },

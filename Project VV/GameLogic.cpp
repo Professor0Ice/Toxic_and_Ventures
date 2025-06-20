@@ -29,22 +29,27 @@ GameLogic::GameLogic()
 
 		currentEntity = new Entity();
 		currentEntity->start(main_player, WelcomeTag);
+		delete currentEntity;
 
 		for (auto& i : QueueEntity) {
 			currentEntity = new Entity();
 			currentEntity->start(main_player, i.second);
+			delete currentEntity;
 
 			currentEntity = new Enemy(i.first);
 			if (!currentEntity->start(main_player)) {
+				delete currentEntity;
 				currentEntity = new Entity();
 				currentEntity->start(main_player, DeathTag);
 
 				break;
 			}
+			delete currentEntity;
 		}
 		std::cout << FinalTag << std::endl;
 		currentEntity = new Entity();
 		currentEntity->start(main_player, FinalTag);
+		delete currentEntity;
 	}
 }
 

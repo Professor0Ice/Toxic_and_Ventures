@@ -1,18 +1,19 @@
 #include "Render.h"
 
 struct AttackEffect {
-	int Stress;
-	int Defense;
-	int Dodge;
+	int stress;
+	int defense;
+	int dodge;
+	int attack;
 };
 
-using EffectFormula = std::function<AttackEffect(struct AttackEffect Attack, std::array<int, 6>& minEmotions, std::array<int, 6>& Emotions)>;
+using EffectFormula = std::function<AttackEffect(struct AttackEffect attack, std::array<int, 6>& minEmotions, std::array<int, 6>& Emotions)>;
 
 struct AttackData {
 	std::string tag;
-	std::array<int, 6> minEmotions;
-	AttackEffect EffectPlayer;
-	AttackEffect EffectEnemy;
+	std::array<int, 6> min_emotions;
+	AttackEffect effect_player;
+	AttackEffect effect_enemy;
 };
 
 enum TypeAttack { damage, debuff, heal, buff, average };
@@ -24,8 +25,8 @@ enum TypePsycho { active, passive, normis };
 struct AttackDataEnemy {
 	std::string tag;
 	int type;
-	AttackEffect EffectPlayer;
-	AttackEffect EffectEnemy;
+	AttackEffect effect_player;
+	AttackEffect effect_enemy;
 };
 
 class AttackRepository {

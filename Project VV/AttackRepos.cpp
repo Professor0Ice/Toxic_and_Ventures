@@ -1,35 +1,35 @@
 #include "AttackRepos.h"
 
-AttackEffect DefaultEffectFormulaTarget(struct AttackEffect Attack, std::array<int, 6>& minEmotions, std::array<int, 6>& Emotions) {
+AttackEffect DefaultEffectFormulaTarget(struct AttackEffect attack, std::array<int, 6>& min_emotions, std::array<int, 6>& Emotions) {
 
-	Attack.Stress += 3 * (Emotions[0]- minEmotions[0]); //страх
+	attack.stress += 3 * (Emotions[0]- min_emotions[0]); //страх
 	
-	Attack.Stress += 4 * (Emotions[1] - minEmotions[1]);//злость
+	attack.stress += 4 * (Emotions[1] - min_emotions[1]);//злость
 
-	Attack.Stress += 2 * (Emotions[2] - minEmotions[2]);//презрение
-	Attack.Dodge -= 5 * (Emotions[2] - minEmotions[2]);
+	attack.stress += 2 * (Emotions[2] - min_emotions[2]);//презрение
+	attack.dodge -= 5 * (Emotions[2] - min_emotions[2]);
 
-	Attack.Stress += 2 * (Emotions[5] - minEmotions[5]);//вдохновение
+	attack.stress += 2 * (Emotions[5] - min_emotions[5]);//вдохновение
 
-	return Attack;
+	return attack;
 }
-AttackEffect DefaultEffectFormulaMe(struct AttackEffect Attack, std::array<int, 6>& minEmotions, std::array<int, 6>& Emotions) {
+AttackEffect DefaultEffectFormulaMe(struct AttackEffect attack, std::array<int, 6>& min_emotions, std::array<int, 6>& Emotions) {
 
-	Attack.Stress += 1* (Emotions[0] - minEmotions[0]); //страх
-	Attack.Dodge += 2 * (Emotions[0] - minEmotions[0]);
+	attack.stress += 1* (Emotions[0] - min_emotions[0]); //страх
+	attack.dodge += 2 * (Emotions[0] - min_emotions[0]);
 
-	Attack.Defense -= 2 * (Emotions[1] - minEmotions[1]);//злость
-	Attack.Dodge -= 2 * (Emotions[1] - minEmotions[1]);
+	attack.defense -= 2 * (Emotions[1] - min_emotions[1]);//злость
+	attack.dodge -= 2 * (Emotions[1] - min_emotions[1]);
 
-	Attack.Stress -= (Emotions[3] - minEmotions[3]);//радость
-	Attack.Defense += 2 * (Emotions[3] - minEmotions[3]);
+	attack.stress -= (Emotions[3] - min_emotions[3]);//радость
+	attack.defense += 2 * (Emotions[3] - min_emotions[3]);
 
-	Attack.Stress -= (Emotions[4] - minEmotions[4]);//умиротворение
-	Attack.Dodge += 2 * (Emotions[4] - minEmotions[4]);
+	attack.stress -= (Emotions[4] - min_emotions[4]);//умиротворение
+	attack.dodge += 2 * (Emotions[4] - min_emotions[4]);
 
-	Attack.Stress -= (Emotions[5] - minEmotions[5]);// вдохновение
+	attack.stress -= (Emotions[5] - min_emotions[5]);// вдохновение
 
-	return Attack;
+	return attack;
 }
 
 std::vector<std::pair<std::string, std::array<int, 6>>> AttackRepository::GetAttackTagsPlayer()
@@ -39,11 +39,11 @@ std::vector<std::pair<std::string, std::array<int, 6>>> AttackRepository::GetAtt
 		throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
 	}
 
-	std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	std::string utf8_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
 	json data;
 	try {
-		data = json::parse(utf8Content);
+		data = json::parse(utf8_content);
 	}
 	catch (const json::parse_error& e) {
 		throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
@@ -65,11 +65,11 @@ std::string AttackRepository::GetAttackByType(std::vector<std::pair<std::string,
 		throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
 	}
 
-	std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	std::string utf8_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
 	json data;
 	try {
-		data = json::parse(utf8Content);
+		data = json::parse(utf8_content);
 	}
 	catch (const json::parse_error& e) {
 		throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
@@ -118,11 +118,11 @@ AttackDataEnemy AttackRepository::GetAttackByTagEnemy(const std::string& tag)
 		throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
 	}
 
-	std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	std::string utf8_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
 	json data;
 	try {
-		data = json::parse(utf8Content);
+		data = json::parse(utf8_content);
 	}
 	catch (const json::parse_error& e) {
 		throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
@@ -137,10 +137,10 @@ AttackDataEnemy AttackRepository::GetAttackByTagEnemy(const std::string& tag)
 			result.tag = attack["tag"].get<std::string>();
 			
 			array = attack["PlayerEffect"].get<std::array<int, 3>>();
-			result.EffectPlayer = {array[0],array[1],array[2]};
+			result.effect_player = {array[0],array[1],array[2]};
 
 			array = attack["EnemyEffect"].get<std::array<int, 3>>();
-			result.EffectEnemy = { array[0],array[1],array[2] };
+			result.effect_enemy = { array[0],array[1],array[2] };
 
 			return result;
 		}
@@ -155,11 +155,11 @@ const AttackData AttackRepository::GetAttackByTagPlayer(const std::string& tag, 
 		throw std::runtime_error("Не удалось открыть файл: RepositoryFun");
 	}
 
-	std::string utf8Content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	std::string utf8_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
 	json data;
 	try {
-		data = json::parse(utf8Content);
+		data = json::parse(utf8_content);
 	}
 	catch (const json::parse_error& e) {
 		throw std::runtime_error("Ошибка парсинга JSON: " + std::string(e.what()));
@@ -174,13 +174,13 @@ const AttackData AttackRepository::GetAttackByTagPlayer(const std::string& tag, 
 		if (attack["tag"].get<std::string>() == tag) {
 
 			result.tag = attack["tag"].get<std::string>();
-			result.minEmotions = attack["minEmotion"].get<std::array<int, 6>>();
+			result.min_emotions = attack["minEmotion"].get<std::array<int, 6>>();
 
 			array = attack["PlayerEffect"].get<std::array<int, 3>>();
-			result.EffectPlayer = DefaultEffectFormulaMe({array[0],array[1],array[2]},result.minEmotions, Emotions);
+			result.effect_player = DefaultEffectFormulaMe({array[0],array[1],array[2]},result.min_emotions, Emotions);
 
 			array = attack["EnemyEffect"].get<std::array<int, 3>>();
-			result.EffectEnemy = DefaultEffectFormulaTarget({ array[0],array[1],array[2] }, result.minEmotions, Emotions);
+			result.effect_enemy = DefaultEffectFormulaTarget({ array[0],array[1],array[2] }, result.min_emotions, Emotions);
 
 			return result;
 		}

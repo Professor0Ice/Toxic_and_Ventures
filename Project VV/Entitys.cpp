@@ -284,7 +284,7 @@ void Player::getLifeTime()
 
 bool Entity::start(Player* playerN, std::string phraseTag)
 {
-    int Nkey;
+    int pressed_key_number;
 
     player = playerN;
 
@@ -320,11 +320,11 @@ bool Entity::start(Player* playerN, std::string phraseTag)
 
     while (true) {
 
-        Nkey = terminal_read();
+        pressed_key_number = terminal_read();
 
-        BaseIfTerminal(Nkey);
+        BaseIfTerminal(pressed_key_number);
 
-        if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
+        if (pressed_key_number == TK_ENTER or pressed_key_number == TK_SPACE) {
             break;
         }
     }
@@ -393,7 +393,7 @@ Enemy::Enemy(const std::string& filename)
 
 bool Enemy::NextAction()
 {
-    int Nkey;
+    int pressed_key_number;
     int sum;
     bool focus = false;
     bool UpDown = true;
@@ -434,11 +434,11 @@ bool Enemy::NextAction()
 
     while (true) {
 
-        Nkey = terminal_peek();
+        pressed_key_number = terminal_peek();
 
-        BaseIfTerminal(Nkey);
+        BaseIfTerminal(pressed_key_number);
 
-		if (Nkey == TK_DOWN) {
+		if (pressed_key_number == TK_DOWN) {
             terminal_read();
             if (NumButton < 4 and UpDown) {
                 focus = false;
@@ -447,7 +447,7 @@ bool Enemy::NextAction()
                 ClearAction();
             }
 		}
-        else if (Nkey == TK_UP) {
+        else if (pressed_key_number == TK_UP) {
             terminal_read();
 
             if (NumButton > 1 and UpDown) {
@@ -458,7 +458,7 @@ bool Enemy::NextAction()
 			}
 		}
 
-		else if (Nkey == TK_LEFT) {
+		else if (pressed_key_number == TK_LEFT) {
             terminal_read();
 
 			if (focus) {
@@ -474,7 +474,7 @@ bool Enemy::NextAction()
 				}
 			}
 		}
-        else if (Nkey == TK_RIGHT) {
+        else if (pressed_key_number == TK_RIGHT) {
             terminal_read();
 
 			if (focus) {
@@ -491,7 +491,7 @@ bool Enemy::NextAction()
 			}
 		}
 
-        else if (Nkey == TK_ENTER or Nkey==TK_SPACE) {
+        else if (pressed_key_number == TK_ENTER or pressed_key_number==TK_SPACE) {
             terminal_read();
 
 			if(!focus){
@@ -507,9 +507,9 @@ bool Enemy::NextAction()
                     ClearAction();
                     DrawText(LoadPhrase("inventoryDespriction") + std::to_wstring(player->getItems().size()), 47, 39);
                     DrawText(LoadPhrase("inventoryPd"), 47, 41);
-                    Nkey = terminal_read();
+                    pressed_key_number = terminal_read();
 
-                    if (Nkey == TK_SPACE and player->getItems().size() > 0) {
+                    if (pressed_key_number == TK_SPACE and player->getItems().size() > 0) {
                         ItemUse();
                     }
                     
@@ -635,7 +635,7 @@ bool Enemy::NextAction()
             }
 		}
 
-        else if (Nkey == TK_BACKSPACE or Nkey == TK_DELETE) {
+        else if (pressed_key_number == TK_BACKSPACE or pressed_key_number == TK_DELETE) {
             terminal_read();
             if (focus and NumButton == 1 and emotionPhrase[LRbutton] != 0 and LRbutton!=7) {
 				emotionPhrase[LRbutton] -= 1;
@@ -645,7 +645,7 @@ bool Enemy::NextAction()
             }
         }
 
-        else if (Nkey != 0) {
+        else if (pressed_key_number != 0) {
             terminal_read();
         }
     }
@@ -889,26 +889,26 @@ std::vector<int> generateShuffledArray(int n) {
 
 void Enemy::DamagePlayer(AttackEffect damage)
 {
-    DefendPlayer += damage.Defense;
-    DodgePlayer += damage.Dodge;
+    DefendPlayer += damage.defense;
+    DodgePlayer += damage.attack;
     std::cout << "\n [Игрок] ";
-    std::cout << "\n Защита игрока увеличина на " << damage.Defense;
-    std::cout << "\n уклонение игрока игрока увеличино на " << damage.Dodge;
+    std::cout << "\n Защита игрока увеличина на " << damage.defense;
+    std::cout << "\n уклонение игрока игрока увеличино на " << damage.attack;
 
     if(DodgePlayer < getRandomInt(1,100) + 20){
-        if (damage.Stress > 0 and DefendPlayer > 0) {
-            DefendPlayer -= damage.Stress;
-            std::cout << "\n щит игрока уменьшен на " << damage.Stress;
+        if (damage.stress > 0 and DefendPlayer > 0) {
+            DefendPlayer -= damage.stress;
+            std::cout << "\n щит игрока уменьшен на " << damage.stress;
             if (DefendPlayer < 0) {
-                damage.Stress = DefendPlayer * (-1);
+                damage.stress = DefendPlayer * (-1);
                 DefendPlayer = 0;
-                stressPlayer += damage.Stress;
-                std::cout << "\n игроку нанесли стресса " << damage.Stress;
+                stressPlayer += damage.stress;
+                std::cout << "\n игроку нанесли стресса " << damage.stress;
             }
         }
         else {
-            stressPlayer += damage.Stress;
-            std::cout << "\n игроку нанесли стресса " << damage.Stress;
+            stressPlayer += damage.stress;
+            std::cout << "\n игроку нанесли стресса " << damage.stress;
         }
         if (DefendPlayer < 0) DefendPlayer = 0;
         if (DodgePlayer < 0) DodgePlayer = 0;
@@ -919,26 +919,26 @@ void Enemy::DamagePlayer(AttackEffect damage)
 
 void Enemy::DamageEnemy(AttackEffect damage)
 {
-	def += damage.Defense;
-	dodge += damage.Dodge;
+	def += damage.defense;
+	dodge += damage.attack;
     std::cout << "\n [Монстр] ";
-	std::cout << "\n Защита монстра увеличина на " << damage.Defense;
-	std::cout << "\n уклонение монстра увеличино на " << damage.Dodge;
+	std::cout << "\n Защита монстра увеличина на " << damage.defense;
+	std::cout << "\n уклонение монстра увеличино на " << damage.attack;
 
 	if (dodge < getRandomInt(1, 100) + 50) {
-		if (damage.Stress > 0 and def > 0) {
-			def -= damage.Stress;
-            std::cout << "\n щит монстра уменьшен на " << damage.Stress;
+		if (damage.stress > 0 and def > 0) {
+			def -= damage.stress;
+            std::cout << "\n щит монстра уменьшен на " << damage.stress;
 			if (def < 0) {
-				damage.Stress = def * (-1);
+				damage.stress = def * (-1);
 				def = 0;
-                stress += damage.Stress;
-                std::cout << "\n монстру нанесли стресса " << damage.Stress;
+                stress += damage.stress;
+                std::cout << "\n монстру нанесли стресса " << damage.stress;
 			}
 		}
 		else {
-			stress += damage.Stress;
-            std::cout << "\n монстру нанесли стресса " << damage.Stress;
+			stress += damage.stress;
+            std::cout << "\n монстру нанесли стресса " << damage.stress;
 		}
         if (def < 0) def = 0;
         if (dodge < 0) dodge = 0;
@@ -952,7 +952,7 @@ float Enemy::RollD20(int difficulty)
     DrawFrameFromFile("d20.txt", 86, 38);
     std::wstring str;
     std::vector<int> values = generateShuffledArray(20);
-    int Nkey;
+    int pressed_key_number;
     int n;
     int i = 0;
     int MaxI = 60;
@@ -964,9 +964,9 @@ float Enemy::RollD20(int difficulty)
 	DrawText(str, 98 - static_cast<int>((str.size()-15) / 2),53);
 
     while(true){
-        Nkey = terminal_peek();
+        pressed_key_number = terminal_peek();
 
-        BaseIfTerminal(Nkey);
+        BaseIfTerminal(pressed_key_number);
 
         n = values[i % 20];
 		if (n / 10 < 1) {
@@ -982,7 +982,7 @@ float Enemy::RollD20(int difficulty)
 			DrawText(L" ", 97, 43);
 		}
 
-		if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
+		if (pressed_key_number == TK_ENTER or pressed_key_number == TK_SPACE) {
             delay(500);
             if (n == 20) {
                 return 2.0f;
@@ -1024,7 +1024,7 @@ float Enemy::RollD20(int difficulty)
 				return -0.2f;
 			}
         }
-        else if (Nkey != 0) {
+        else if (pressed_key_number != 0) {
             terminal_read();
         }
 
@@ -1043,8 +1043,8 @@ std::string Enemy::SelectPhrase(AttackRepository& Repos)
     std::vector<std::string> pullMaxPhrase;
     std::vector<std::string> pull;
     bool correct;
-    int MaxPh = 0;
-    int Nkey;
+    int MaxPh = 0; //гарантия наличия фразы с максимумом вложенных эмоций
+    int pressed_key_number;
 
     std::string tagDestoy;
 
@@ -1098,20 +1098,20 @@ std::string Enemy::SelectPhrase(AttackRepository& Repos)
     SelectPhraseText(pull, LRbutton-7);
 
     while (true) {
-        Nkey = terminal_read();
-        BaseIfTerminal(Nkey);
+        pressed_key_number = terminal_read();
+        BaseIfTerminal(pressed_key_number);
 
-        if (Nkey == TK_ENTER or Nkey == TK_SPACE) {
+        if (pressed_key_number == TK_ENTER or pressed_key_number == TK_SPACE) {
             return pull[LRbutton - 7];
         }
 
-		if (Nkey == TK_LEFT) {
+		if (pressed_key_number == TK_LEFT) {
             if (LRbutton > MinLRbutton) {
 				LRbutton--;
                 SelectPhraseText(pull, LRbutton - 7);
 			}
 		}
-		if (Nkey == TK_RIGHT) {
+		if (pressed_key_number == TK_RIGHT) {
 			if (LRbutton < MaxLRbutton) {
 				LRbutton++;
                 SelectPhraseText(pull, LRbutton - 7);
@@ -1201,19 +1201,19 @@ void Enemy::ResultStep(AttackRepository& Repos, std::string PlayerAttack, int Mu
 
     AttackPlayer = AttackRepository().GetAttackByTagPlayer(PlayerAttack, emotionPhrase);
 
-    AttackEffect = AttackPlayer.EffectPlayer;
+    AttackEffect = AttackPlayer.effect_player;
 
-    AttackEffect.Defense = static_cast<int>(AttackEffect.Defense * Multiply);
-    AttackEffect.Dodge = static_cast<int>(AttackEffect.Dodge * Multiply);
-    AttackEffect.Stress = static_cast<int>(AttackEffect.Stress * Multiply);
+    AttackEffect.defense = static_cast<int>(AttackEffect.defense * Multiply);
+    AttackEffect.attack = static_cast<int>(AttackEffect.attack * Multiply);
+    AttackEffect.stress = static_cast<int>(AttackEffect.stress * Multiply);
 
     DamagePlayer(AttackEffect);
 
-    AttackEffect = AttackPlayer.EffectEnemy;
+    AttackEffect = AttackPlayer.effect_enemy;
 
-    AttackEffect.Defense = static_cast<int>(AttackEffect.Defense * Multiply);
-    AttackEffect.Dodge = static_cast<int>(AttackEffect.Dodge * Multiply);
-    AttackEffect.Stress = static_cast<int>(AttackEffect.Stress * Multiply);
+    AttackEffect.defense = static_cast<int>(AttackEffect.defense * Multiply);
+    AttackEffect.attack = static_cast<int>(AttackEffect.attack * Multiply);
+    AttackEffect.stress = static_cast<int>(AttackEffect.stress * Multiply);
 
     DamageEnemy(AttackEffect);
 
@@ -1227,15 +1227,15 @@ void Enemy::ResultStep(AttackRepository& Repos, std::string PlayerAttack, int Mu
 
     
 
-    AttackEffect.Defense = AttackEnemy.EffectPlayer.Defense;
-    AttackEffect.Dodge = AttackEnemy.EffectPlayer.Dodge;
-    AttackEffect.Stress = AttackEnemy.EffectPlayer.Stress;
+    AttackEffect.defense = AttackEnemy.effect_player.defense;
+    AttackEffect.attack = AttackEnemy.effect_player.attack;
+    AttackEffect.stress = AttackEnemy.effect_player.stress;
 
     DamagePlayer(AttackEffect);
 
-    AttackEffect.Defense = AttackEnemy.EffectEnemy.Defense;
-    AttackEffect.Dodge = AttackEnemy.EffectEnemy.Dodge;
-    AttackEffect.Stress = AttackEnemy.EffectEnemy.Stress;
+    AttackEffect.defense = AttackEnemy.effect_enemy.defense;
+    AttackEffect.attack = AttackEnemy.effect_enemy.attack;
+    AttackEffect.stress = AttackEnemy.effect_enemy.stress;
 
     DamageEnemy(AttackEffect);
 
